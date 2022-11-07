@@ -28,7 +28,8 @@ void ShowBigClock()
 }
 void BigClock()
 {
-
+  lcd.setCursor(0, 0);
+  lcd.print("              "); // Clean info
   if (FlagInfo)
   {
     // Data Show
@@ -87,7 +88,7 @@ void BigClock()
     lcd.setCursor(4, 0);
     lcd.print(char(223)); // Degree ASCII
     lcd.print(char(67));  // C capital ASCII
-    
+
     //  Show alarm status.
     lcd.setCursor(8, 0);
     lcd.print("A1");
