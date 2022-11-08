@@ -29,7 +29,7 @@ void showDatePage(void)
 
   while (true)
   {
-    //alarm();    // Activate if you want detect alarm on setting
+    // alarm();    // Activate if you want detect alarm on setting
     showDate(); // show date
     enter();    // input
     LDR_Sensor();
@@ -506,8 +506,8 @@ void changeFour()
     }
 
     if (mode > 5)
-      mode = 1;
-    if (mode < 1)
+      mode = 2;
+    if (mode < 2)
       mode = 5;
     lcd.setCursor(row_k, col_k);
     lcd.print(mode);

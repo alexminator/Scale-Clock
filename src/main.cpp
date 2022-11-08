@@ -70,7 +70,7 @@ const int LED2 = A2;
 
 // Brightness LCD control using LDR
 const int LDR_PIN = A3;
-const int BACKLIGHT_PIN = 10;
+const int BACKLIGHT_PIN = 10; // PWM Pin
 int ldr, bri;
 
 // Buzzer Pin
@@ -110,13 +110,15 @@ int y1, y2, mon1, mon2, d1, d2, h1, h2, min1, min2, s1, s2, t1, t2, t3, t4, conv
 float temp;
 int alarm_h1, alarm_h2, alarm_m1, alarm_m2, alarm_s1, alarm_s2;
 int alarm_hh1, alarm_hh2, alarm_mm1, alarm_mm2;
-int mode = 1;            // Time to show other info
 bool BC_flag;            // false selective value plus 1, true sselective value subtracts 1
 bool scale_flag = false; // false is pricing scale,true is counting scale
 
 String Mode_arr[2] = {"12H", "24H"};
 String M_arr[12] = {"Ene-", "Feb-", "Mar-", "Abr-", "May-", "Jun-", "Jul-", "Ago-", "Sep-", "Oct-", "Nov-", "Dic-"};
 String WD_arr[7] = {"Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"};
+
+// Time info variables
+int mode = 2; // Time to show other info. Default 2 mint.
 
 void showDatePage(void);
 void showDate();
@@ -139,7 +141,9 @@ void enter();
 void ShowBigClock();
 void BigClock();
 void LDR_Sensor();
-void info();
+void OtherInfo();
+void ShowInfo();
+void ShowDateInfo();
 
 #include "ClockRoutines.h"
 #include "Clock.h"

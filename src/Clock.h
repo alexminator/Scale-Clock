@@ -13,7 +13,7 @@ void ShowBigClock()
     if (KE == 1) // Power off LED 1 or LED 2 alarm and change page
     {
       KE = 0;
-      info();
+      OtherInfo();
       break;
     }
     if (KD == 1) // Power off LED 1 or LED 2 alarm and change page
@@ -26,33 +26,12 @@ void ShowBigClock()
     }
   }
 }
+
 void BigClock()
 {
-  lcd.setCursor(0, 0);
-  lcd.print("              "); // Clean info
   if (FlagInfo)
   {
-    // Data Show
-    // and the day of the week
-    week = reloj.getDoW();
-    lcd.setCursor(0, 0);
-    lcd.print(WD_arr[week - 1]);
-
-    // first the date
-    date = reloj.getDate();
-    lcd.setCursor(4, 0);
-    lcd.print(date);
-    // Year
-    year = reloj.getYear();
-    lcd.setCursor(11, 0);
-    lcd.print(year);
-    // dash
-    lcd.setCursor(6, 0);
-    lcd.print("-");
-    // then the month
-    month = reloj.getMonth(century);
-    lcd.setCursor(7, 0);
-    lcd.print(M_arr[month - 1]); // Minus one, arrays begins in 0
+    ShowDateInfo();
   }
 
   // hour, minute, and second
@@ -70,41 +49,7 @@ void BigClock()
   if (min2 == 5 && page == 0)
   {
     FlagInfo = false;
-    lcd.setCursor(0, 0);
-    lcd.print("              "); // Clean info
-    // Display the temperature
-    if (reloj.getTemperature() < 10)
-    {
-      lcd.setCursor(0, 0);
-      lcd.print(" ");
-      lcd.setCursor(0, 0);
-      lcd.print(reloj.getTemperature(), 1);
-    }
-    else
-    {
-      lcd.setCursor(0, 0);
-      lcd.print(reloj.getTemperature(), 1);
-    }
-    lcd.setCursor(4, 0);
-    lcd.print(char(223)); // Degree ASCII
-    lcd.print(char(67));  // C capital ASCII
-
-    //  Show alarm status.
-    lcd.setCursor(8, 0);
-    lcd.print("A1");
-    lcd.setCursor(11, 0);
-    lcd.print("A2");
-
-    if (reloj.checkAlarmEnabled(1))
-    {
-      lcd.setCursor(7, 0);
-      lcd.print(char(126));
-    }
-    if (reloj.checkAlarmEnabled(2))
-    {
-      lcd.setCursor(10, 0);
-      lcd.print(char(126));
-    }
+    ShowInfo();
   }
   else
   {
@@ -137,7 +82,7 @@ void BigClock()
   delay(50);
 }
 
-void info()
+void OtherInfo()
 {
   // lcd.init();
   lcd.clear();
@@ -185,4 +130,71 @@ void info()
       break;
     }
   }
+}
+
+void ShowInfo()
+{
+  lcd.setCursor(0, 0);
+  lcd.print("              "); // Clean info
+  // Display the temperature
+  if (reloj.getTemperature() < 10)
+  {
+    lcd.setCursor(0, 0);
+    lcd.print(" ");
+    lcd.setCursor(0, 0);
+    lcd.print(reloj.getTemperature(), 1);
+  }
+  else
+  {
+    lcd.setCursor(0, 0);
+    lcd.print(reloj.getTemperature(), 1);
+  }
+  lcd.setCursor(4, 0);
+  lcd.print(char(223)); // Degree ASCII
+  lcd.print(char(67));  // C capital ASCII
+
+  //  Show alarm status.
+  lcd.setCursor(8, 0);
+  lcd.print("A1");
+  lcd.setCursor(11, 0);
+  lcd.print("A2");
+
+  if (reloj.checkAlarmEnabled(1))
+  {
+    lcd.setCursor(7, 0);
+    lcd.print(char(126));
+  }
+  if (reloj.checkAlarmEnabled(2))
+  {
+    lcd.setCursor(10, 0);
+    lcd.print(char(126));
+  }
+}
+
+void ShowDateInfo()
+
+{
+  lcd.setCursor(0, 0);
+  lcd.print("              "); // Clean info
+  // Data Show
+  // and the day of the week
+  week = reloj.getDoW();
+  lcd.setCursor(0, 0);
+  lcd.print(WD_arr[week - 1]);
+
+  // first the date
+  date = reloj.getDate();
+  lcd.setCursor(4, 0);
+  lcd.print(date);
+  // Year
+  year = reloj.getYear();
+  lcd.setCursor(11, 0);
+  lcd.print(year);
+  // dash
+  lcd.setCursor(6, 0);
+  lcd.print("-");
+  // then the month
+  month = reloj.getMonth(century);
+  lcd.setCursor(7, 0);
+  lcd.print(M_arr[month - 1]); // Minus one, arrays begins in 0
 }
