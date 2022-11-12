@@ -162,12 +162,12 @@ void ShowInfo()
   if (reloj.checkAlarmEnabled(1))
   {
     lcd.setCursor(7, 0);
-    lcd.print(char(126));
+    lcd.print(char(126)); //Arrow pointer Alarm A1
   }
   if (reloj.checkAlarmEnabled(2))
   {
     lcd.setCursor(10, 0);
-    lcd.print(char(126));
+    lcd.print(char(126)); //Arrow pointer Alarm A2
   }
 }
 
