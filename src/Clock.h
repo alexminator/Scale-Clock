@@ -7,7 +7,14 @@ void ShowBigClock()
 
     alarm(); // detect alarm
     LDR_Sensor();
-    ShowDateInfo();
+    if (shouldShowInfo())
+    {
+      ShowInfo();
+    }
+    else
+    {
+      ShowDateInfo();
+    }
     BigClock();
     enter();
 
@@ -110,6 +117,66 @@ void BigClock()
   delay(50);
 }
 
+bool shouldShowInfo()
+{
+  if (millis() - startCollecting >= 60000)
+  {
+    isClockInfoShown = false;
+    return isClockInfoShown;
+  }
+
+  if (isClockInfoShown)
+  {
+    return true;
+  }
+  else
+  {
+    unsigned long IntervalInfo;
+    if (mode == 2)
+    {
+      IntervalInfo = 120000;
+      if (millis() >= now + IntervalInfo)
+      {
+        now = millis();
+        Serial.println("2 mints");
+        return true;
+      }
+    }
+    else if (mode == 3)
+    {
+      IntervalInfo = 180000;
+      if (millis() >= now + IntervalInfo)
+      {
+        now = millis();
+        Serial.println("3 mints");
+        return true;
+      }
+    }
+    else if (mode == 4)
+    {
+      IntervalInfo = 240000;
+      if (millis() >= now + IntervalInfo)
+      {
+        now = millis();
+        Serial.println("4 mints");
+        return true;
+      }
+    }
+    else if (mode == 5)
+    {
+      IntervalInfo = 300000;
+      if (millis() >= now + IntervalInfo)
+      {
+        now = millis();
+        Serial.println("5 mints");
+        return true;
+      }
+
+      return false;
+    }
+  }
+}
+
 void OtherInfo()
 {
   // lcd.init();
@@ -162,62 +229,46 @@ void OtherInfo()
 
 void ShowInfo()
 {
-  unsigned long startCollecting = millis();
-  lcd.setCursor(0, 0);
-  lcd.print("              ");               // Clean info
-  while (millis() - startCollecting < 60000) // Wait 1 mint showing info
+  if (!isClockInfoShown)
   {
-    alarm(); // detect alarm
-    LDR_Sensor();
-    BigClock();
-    enter();
-    // Display the temperature
-    if (reloj.getTemperature() < 10)
-    {
-      lcd.setCursor(0, 0);
-      lcd.print(" ");
-      lcd.setCursor(0, 0);
-      lcd.print(reloj.getTemperature(), 1);
-    }
-    else
-    {
-      lcd.setCursor(0, 0);
-      lcd.print(reloj.getTemperature(), 1);
-    }
-    lcd.setCursor(4, 0);
-    lcd.print(char(223)); // Degree ASCII
-    lcd.print(char(67));  // C capital ASCII
+    startCollecting = millis();
+    isClockInfoShown = true;
+  }
+  lcd.setCursor(0, 0);
+  lcd.print("              "); // Clean info
 
-    //  Show alarm status.
-    lcd.setCursor(8, 0);
-    lcd.print("A1");
-    lcd.setCursor(11, 0);
-    lcd.print("A2");
+  // Display the temperature
+  if (reloj.getTemperature() < 10)
+  {
+    lcd.setCursor(0, 0);
+    lcd.print(" ");
+    lcd.setCursor(0, 0);
+    lcd.print(reloj.getTemperature(), 1);
+  }
+  else
+  {
+    lcd.setCursor(0, 0);
+    lcd.print(reloj.getTemperature(), 1);
+  }
+  lcd.setCursor(4, 0);
+  lcd.print(char(223)); // Degree ASCII
+  lcd.print(char(67));  // C capital ASCII
 
-    if (reloj.checkAlarmEnabled(1))
-    {
-      lcd.setCursor(7, 0);
-      lcd.print(char(126));
-    }
-    if (reloj.checkAlarmEnabled(2))
-    {
-      lcd.setCursor(10, 0);
-      lcd.print(char(126));
-    }
-    if (KE == 1) // Power off LED 1 or LED 2 alarm and change page
-    {
-      KE = 0;
-      OtherInfo();
-      break;
-    }
-    if (KD == 1) // Power off LED 1 or LED 2 alarm and change page
-    {
-      KD = 0;
-      page = 1;
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      break;
-    }
+  //  Show alarm status.
+  lcd.setCursor(8, 0);
+  lcd.print("A1");
+  lcd.setCursor(11, 0);
+  lcd.print("A2");
+
+  if (reloj.checkAlarmEnabled(1))
+  {
+    lcd.setCursor(7, 0);
+    lcd.print(char(126));
+  }
+  if (reloj.checkAlarmEnabled(2))
+  {
+    lcd.setCursor(10, 0);
+    lcd.print(char(126));
   }
 }
 

@@ -119,8 +119,10 @@ String WD_arr[7] = {"Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"};
 
 //Time info variables
 int mode = 2;            // Time to show other info. Default 2 mint.
+bool isClockInfoShown = false;
 unsigned long IntervalInfo; 
 unsigned long now = 0;
+unsigned long startCollecting = 0; // Aux variable for Clock information
 
 void showDatePage(void);
 void showDate();
