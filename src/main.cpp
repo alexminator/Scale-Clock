@@ -70,7 +70,7 @@ const int LED2 = A2;
 
 // Brightness LCD control using LDR
 const int LDR_PIN = A3;
-const int BACKLIGHT_PIN = 10; // PWM Pin
+const int BACKLIGHT_PIN = 10;  //PWM Pin
 int ldr, bri;
 
 // Buzzer Pin
@@ -117,8 +117,10 @@ String Mode_arr[2] = {"12H", "24H"};
 String M_arr[12] = {"Ene-", "Feb-", "Mar-", "Abr-", "May-", "Jun-", "Jul-", "Ago-", "Sep-", "Oct-", "Nov-", "Dic-"};
 String WD_arr[7] = {"Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"};
 
-// Time info variables
-int mode = 2; // Time to show other info. Default 2 mint.
+//Time info variables
+int mode = 2;            // Time to show other info. Default 2 mint.
+unsigned long IntervalInfo; 
+unsigned long now = 0;
 
 void showDatePage(void);
 void showDate();
@@ -220,7 +222,7 @@ void setup()
 
 void loop()
 {
-
+  
   /* press 'D' key to switch page
      when page is 0, display CLOCK
      when page is 1, show the page of alarm setting
