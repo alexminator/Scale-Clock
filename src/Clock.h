@@ -31,17 +31,17 @@ void ShowBigClock()
       digitalWrite(LED2, LOW);
       break;
     }
-    if (KB == 1) // Show other info sub screen. Temp & voltage of batt
+    if (KB == 1) // Show hour in 12H mode
     {
       KB = 0;
-      HourFormat12(); //Convert to 12h, only for show on bigclock
+      HourFormat12(); // Convert to 12H, only for show on bigclock
       h12Flag = true;
       break;
     }
     if (KC == 1) // Return to 24H mode
     {
       KC = 0;
-      hour = reloj.getHour(h12Flag, pmFlag); // Get hour 24h format
+      hour = reloj.getHour(h12Flag, pmFlag); // Get hour 24H format
       break;
     }
   }
@@ -326,7 +326,6 @@ void ShowDateInfo()
 
 void HourFormat12()
 {
-
   hour = reloj.getHour(h12Flag, pmFlag);
   if (hour == 0)
   {
