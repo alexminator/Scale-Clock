@@ -555,5 +555,5 @@ void setTime()
   reloj.setDate(date);       // set day
   reloj.setMonth(month);     // set month
   reloj.setYear(year);       // set year
-  reloj.setClockMode(false); // set 12h(true) or 24 h(false)
+  reloj.setClockMode(false); // set 12h(true) or 24 h(false). This must be first than hour
 }

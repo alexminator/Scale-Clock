@@ -72,7 +72,7 @@ const int LED2 = A2;
 const int LDR_PIN = A3;
 const int BACKLIGHT_PIN = 10;  //PWM Pin
 int ldr, bri;
-int bled = 6; //Set LCD Brigth AUTO mode
+int bled = 6; //Set LCD Bright AUTO mode
 
 // Buzzer Pin
 const int buzzer = A0;
@@ -114,8 +114,7 @@ int alarm_hh1, alarm_hh2, alarm_mm1, alarm_mm2;
 bool BC_flag;            // false selective value plus 1, true sselective value subtracts 1
 bool scale_flag = false; // false is pricing scale,true is counting scale
 
-String Mode_arr[2] = {"12H", "24H"};
-String M_arr[12] = {"Ene-", "Feb-", "Mar-", "Abr-", "May-", "Jun-", "Jul-", "Ago-", "Sep-", "Oct-", "Nov-", "Dic-"};
+String M_arr[12] = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
 String WD_arr[7] = {"Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"};
 
 //Time info variables
@@ -150,6 +149,7 @@ void OtherInfo();
 void ShowInfo();
 void ShowDateInfo();
 bool shouldShowInfo();
+void HourFormat12();
 
 #include "ClockRoutines.h"
 #include "Clock.h"

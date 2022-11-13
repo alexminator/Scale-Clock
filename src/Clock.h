@@ -4,7 +4,6 @@ void ShowBigClock()
   lcd.clear();
   while (true)
   {
-
     alarm(); // detect alarm
     LDR_Sensor();
     if (shouldShowInfo())
@@ -18,7 +17,7 @@ void ShowBigClock()
     BigClock();
     enter();
 
-    if (KE == 1) // Power off LED 1 or LED 2 alarm and change page
+    if (KE == 1) // Show other info sub screen. Temp & voltage of batt
     {
       KE = 0;
       OtherInfo();
@@ -32,12 +31,29 @@ void ShowBigClock()
       digitalWrite(LED2, LOW);
       break;
     }
+    if (KB == 1) // Show other info sub screen. Temp & voltage of batt
+    {
+      KB = 0;
+      HourFormat12(); //Convert to 12h, only for show on bigclock
+      h12Flag = true;
+      break;
+    }
+    if (KC == 1) // Return to 24H mode
+    {
+      KC = 0;
+      hour = reloj.getHour(h12Flag, pmFlag); // Get hour 24h format
+      break;
+    }
   }
 }
+
 void BigClock()
 {
   // hour, minute, and second
-  hour = reloj.getHour(h12Flag, pmFlag);
+  if (!h12Flag)
+  {
+    hour = reloj.getHour(h12Flag, pmFlag);
+  }
   h1 = hour / 10;
   h2 = hour % 10;
   minute = reloj.getMinute();
@@ -225,7 +241,7 @@ void ShowInfo()
     isClockInfoShown = true;
   }
   lcd.setCursor(0, 0);
-  lcd.print("              "); // Clean info
+  lcd.print("             "); // Clean info
 
   // Display the temperature
   if (reloj.getTemperature() < 10)
@@ -265,7 +281,7 @@ void ShowInfo()
 void ShowDateInfo()
 {
   lcd.setCursor(0, 0);
-  lcd.print("              "); // Clean info
+  lcd.print("             "); // Clean info
 
   // Data Show
   // and the day of the week
@@ -285,7 +301,7 @@ void ShowDateInfo()
 
   if (h12Flag)
   {
-    if (!pmFlag)
+    if (pmFlag)
     {
       lcd.setCursor(11, 0);
       lcd.print("PM");
@@ -298,12 +314,26 @@ void ShowDateInfo()
   }
   else
   {
+    // dash
+    lcd.setCursor(10, 0);
+    lcd.print("-");
     // Year
     year = reloj.getYear();
     lcd.setCursor(11, 0);
     lcd.print(year);
-    // dash
-    lcd.setCursor(10, 0);
-    lcd.print("-");
+  }
+}
+
+void HourFormat12()
+{
+
+  hour = reloj.getHour(h12Flag, pmFlag);
+  if (hour == 0)
+  {
+    hour = 12; // 12 Midnight
+  }
+  else if (hour > 12)
+  {
+    hour = hour - 12;
   }
 }
