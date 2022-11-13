@@ -70,9 +70,9 @@ const int LED2 = A2;
 
 // Brightness LCD control using LDR
 const int LDR_PIN = A3;
-const int BACKLIGHT_PIN = 10;  //PWM Pin
+const int BACKLIGHT_PIN = 10; // PWM Pin
 int ldr, bri;
-int bled = 6; //Set LCD Bright AUTO mode
+int bled = 6; // Set LCD Bright AUTO mode
 
 // Buzzer Pin
 const int buzzer = A0;
@@ -97,7 +97,6 @@ byte hr, mn, osec;
 bool century = false;
 bool h12Flag;
 bool pmFlag;
-bool ampm;
 bool FlagInfo = true;
 
 byte alarmDay, alarmHour1, alarmMinute1, alarmSecond1, alarmBits = 0x48;
@@ -117,10 +116,10 @@ bool scale_flag = false; // false is pricing scale,true is counting scale
 String M_arr[12] = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
 String WD_arr[7] = {"Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"};
 
-//Time info variables
-int mode = 2;            // Time to show other info. Default 2 mint.
+// Time info variables
+int mode = 2; // Time to show other info. Default 2 mint.
 bool isClockInfoShown = false;
-unsigned long IntervalInfo; 
+unsigned long IntervalInfo;
 unsigned long now = 0;
 unsigned long startCollecting = 0; // Aux variable for Clock information
 
@@ -226,7 +225,6 @@ void setup()
 
 void loop()
 {
-  
   /* press 'D' key to switch page
      when page is 0, display CLOCK
      when page is 1, show the page of alarm setting
