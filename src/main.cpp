@@ -72,6 +72,7 @@ const int LED2 = A2;
 const int LDR_PIN = A3;
 const int BACKLIGHT_PIN = 10;  //PWM Pin
 int ldr, bri;
+int bled = 6; //Set LCD Brigth AUTO mode
 
 // Buzzer Pin
 const int buzzer = A0;
@@ -148,6 +149,7 @@ void LDR_Sensor();
 void OtherInfo();
 void ShowInfo();
 void ShowDateInfo();
+bool shouldShowInfo();
 
 #include "ClockRoutines.h"
 #include "Clock.h"

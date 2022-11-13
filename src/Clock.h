@@ -36,7 +36,6 @@ void ShowBigClock()
 }
 void BigClock()
 {
-
   // hour, minute, and second
   hour = reloj.getHour(h12Flag, pmFlag);
   h1 = hour / 10;
@@ -52,41 +51,37 @@ void BigClock()
 
   if (mode == 2)
   {
-    const unsigned long IntervalInfo = 120000;
+    IntervalInfo = 120000;
     if (millis() >= now + IntervalInfo)
     {
       now = millis();
-      Serial.println("2 mints");
       ShowInfo();
     }
   }
   else if (mode == 3)
   {
-    const unsigned long IntervalInfo = 180000;
+    IntervalInfo = 180000;
     if (millis() >= now + IntervalInfo)
     {
       now = millis();
-      Serial.println("3 mints");
       ShowInfo();
     }
   }
   else if (mode == 4)
   {
-    const unsigned long IntervalInfo = 240000;
+    IntervalInfo = 240000;
     if (millis() >= now + IntervalInfo)
     {
       now = millis();
-      Serial.println("4 mints");
       ShowInfo();
     }
   }
   else if (mode == 5)
   {
-    const unsigned long IntervalInfo = 300000;
+    IntervalInfo = 300000;
     if (millis() >= now + IntervalInfo)
     {
       now = millis();
-      Serial.println("5 mints");
       ShowInfo();
     }
   }
@@ -131,14 +126,13 @@ bool shouldShowInfo()
   }
   else
   {
-    unsigned long IntervalInfo;
+
     if (mode == 2)
     {
       IntervalInfo = 120000;
       if (millis() >= now + IntervalInfo)
       {
         now = millis();
-        Serial.println("2 mints");
         return true;
       }
     }
@@ -148,7 +142,6 @@ bool shouldShowInfo()
       if (millis() >= now + IntervalInfo)
       {
         now = millis();
-        Serial.println("3 mints");
         return true;
       }
     }
@@ -158,7 +151,6 @@ bool shouldShowInfo()
       if (millis() >= now + IntervalInfo)
       {
         now = millis();
-        Serial.println("4 mints");
         return true;
       }
     }
@@ -168,12 +160,10 @@ bool shouldShowInfo()
       if (millis() >= now + IntervalInfo)
       {
         now = millis();
-        Serial.println("5 mints");
         return true;
       }
-
-      return false;
     }
+    return false;
   }
 }
 
@@ -287,15 +277,33 @@ void ShowDateInfo()
   date = reloj.getDate();
   lcd.setCursor(4, 0);
   lcd.print(date);
-  // Year
-  year = reloj.getYear();
-  lcd.setCursor(11, 0);
-  lcd.print(year);
-  // dash
-  lcd.setCursor(6, 0);
-  lcd.print("-");
+
   // then the month
   month = reloj.getMonth(century);
   lcd.setCursor(7, 0);
   lcd.print(M_arr[month - 1]); // Minus one, arrays begins in 0
+
+  if (h12Flag)
+  {
+    if (!pmFlag)
+    {
+      lcd.setCursor(11, 0);
+      lcd.print("PM");
+    }
+    else
+    {
+      lcd.setCursor(11, 0);
+      lcd.print("AM");
+    }
+  }
+  else
+  {
+    // Year
+    year = reloj.getYear();
+    lcd.setCursor(11, 0);
+    lcd.print(year);
+    // dash
+    lcd.setCursor(10, 0);
+    lcd.print("-");
+  }
 }

@@ -11,11 +11,13 @@ void showDatePage(void)
   lcd.print("Time:");
   lcd.setCursor(0, 3);
   lcd.print("Info:");
-  lcd.setCursor(10, 3);
+  lcd.setCursor(7, 3);
   lcd.print("Day:");
-  lcd.setCursor(6, 1);
+  lcd.setCursor(13, 3);
+  lcd.print("LCD:");
+  lcd.setCursor(5, 1);
   lcd.print("2");
-  lcd.setCursor(7, 1);
+  lcd.setCursor(6, 1);
   if (century)
   {
     lcd.print("1");
@@ -24,12 +26,14 @@ void showDatePage(void)
   {
     lcd.print("0");
   }
-  lcd.setCursor(6, 3);
-  lcd.print(mode);
+  lcd.setCursor(5, 3);
+  lcd.print(mode); // Show 2 mints default info
+  lcd.setCursor(17, 3);
+  lcd.print("A"); // Show AUTO LCD Bright
 
   while (true)
   {
-    // alarm();    // Activate if you want detect alarm on setting
+    alarm();    // Activate if you want detect alarm on setting
     showDate(); // show date
     enter();    // input
     LDR_Sensor();
@@ -43,9 +47,9 @@ void showDatePage(void)
         {
           KA = 0;
           row_k += 1;
-          if (row_k > 15)
+          if (row_k > 17)
           {
-            row_k = 6;
+            row_k = 5;
             col_k += 1;
             if (col_k > 3)
             {
@@ -113,24 +117,24 @@ void showDatePage(void)
 void showDate()
 {
   // Show Clock of settings.
-  lcd.setCursor(8, 1);
+  lcd.setCursor(7, 1);
   year = reloj.getYear();
   y1 = year / 10;
   y2 = year % 10;
   if (year < 10)
   {
-    lcd.setCursor(8, 1);
+    lcd.setCursor(7, 1);
     lcd.print("0");
-    lcd.setCursor(9, 1);
+    lcd.setCursor(8, 1);
     lcd.print(year);
   }
   else
   {
-    lcd.setCursor(8, 1);
+    lcd.setCursor(7, 1);
     lcd.print(year);
   }
 
-  lcd.setCursor(10, 1);
+  lcd.setCursor(9, 1);
   lcd.print("-");
 
   // then the month
@@ -139,18 +143,18 @@ void showDate()
   mon2 = month % 10;
   if (month < 10)
   {
-    lcd.setCursor(11, 1);
+    lcd.setCursor(10, 1);
     lcd.print("0");
-    lcd.setCursor(12, 1);
+    lcd.setCursor(11, 1);
     lcd.print(month);
   }
   else
   {
-    lcd.setCursor(11, 1);
+    lcd.setCursor(10, 1);
     lcd.print(month);
   }
 
-  lcd.setCursor(13, 1);
+  lcd.setCursor(12, 1);
   lcd.print("-");
 
   // then the date
@@ -159,23 +163,23 @@ void showDate()
   d2 = date % 10;
   if (date < 10)
   {
-    lcd.setCursor(14, 1);
+    lcd.setCursor(13, 1);
     lcd.print("0");
-    lcd.setCursor(15, 1);
+    lcd.setCursor(14, 1);
     lcd.print(date);
   }
   else
   {
-    lcd.setCursor(14, 1);
+    lcd.setCursor(13, 1);
     lcd.print(date);
   }
 
-  lcd.setCursor(16, 1);
+  lcd.setCursor(15, 1);
   lcd.print(" ");
 
   // and the day of the week
   week = reloj.getDoW();
-  lcd.setCursor(15, 3);
+  lcd.setCursor(11, 3);
   lcd.print(week);
 
   // Finally the hour, minute, and second
@@ -185,18 +189,18 @@ void showDate()
   h2 = hour % 10;
   if (hour < 10)
   {
-    lcd.setCursor(6, 2);
+    lcd.setCursor(5, 2);
     lcd.print("0");
-    lcd.setCursor(7, 2);
+    lcd.setCursor(6, 2);
     lcd.print(hour);
   }
   else
   {
-    lcd.setCursor(6, 2);
+    lcd.setCursor(5, 2);
     lcd.print(hour);
   }
 
-  lcd.setCursor(8, 2);
+  lcd.setCursor(7, 2);
   lcd.print(":");
 
   minute = reloj.getMinute();
@@ -204,18 +208,18 @@ void showDate()
   min2 = minute % 10;
   if (minute < 10)
   {
-    lcd.setCursor(9, 2);
+    lcd.setCursor(8, 2);
     lcd.print("0");
-    lcd.setCursor(10, 2);
+    lcd.setCursor(9, 2);
     lcd.print(minute);
   }
   else
   {
-    lcd.setCursor(9, 2);
+    lcd.setCursor(8, 2);
     lcd.print(minute);
   }
 
-  lcd.setCursor(11, 2);
+  lcd.setCursor(10, 2);
   lcd.print(":");
 
   second = reloj.getSecond();
@@ -223,45 +227,27 @@ void showDate()
   s2 = second % 10;
   if (second < 10)
   {
-    lcd.setCursor(12, 2);
+    lcd.setCursor(11, 2);
     lcd.print("0");
-    lcd.setCursor(13, 2);
+    lcd.setCursor(12, 2);
     lcd.print(second);
   }
   else
   {
-    lcd.setCursor(12, 2);
+    lcd.setCursor(11, 2);
     lcd.print(second);
   }
-  lcd.setCursor(14, 2);
+  lcd.setCursor(13, 2);
   lcd.print(" ");
 
-  // Add AM/PM indicator
-  if (h12Flag)
-  {
-    if (pmFlag)
-    {
-      lcd.setCursor(15, 2);
-      lcd.print("PM");
-    }
-    else
-    {
-      lcd.setCursor(15, 2);
-      lcd.print("AM");
-    }
-  }
-  else
-  {
-    lcd.setCursor(15, 2);
-    lcd.print("24H");
-  }
+  
 }
 
 void changeTwo()
 { // modify year, month, day, week at the first row
   switch (row_k)
   { // select row
-  case 8:
+  case 7:
     if (!BC_flag)
     {
       y1 += 1;
@@ -279,7 +265,7 @@ void changeTwo()
     year = y1 * 10 + y2;
     break;
 
-  case 9:
+  case 8:
     if (!BC_flag)
     {
       y2 += 1;
@@ -297,7 +283,7 @@ void changeTwo()
     year = y1 * 10 + y2;
     break;
 
-  case 11:
+  case 10:
     if (!BC_flag)
     {
       mon1 += 1;
@@ -315,7 +301,7 @@ void changeTwo()
     month = mon1 * 10 + mon2;
     break;
 
-  case 12:
+  case 11:
     if (!BC_flag)
     {
       mon2 += 1;
@@ -333,7 +319,7 @@ void changeTwo()
     month = mon1 * 10 + mon2;
     break;
 
-  case 14:
+  case 13:
     if (!BC_flag)
     {
       d1 += 1;
@@ -351,7 +337,7 @@ void changeTwo()
     date = d1 * 10 + d2;
     break;
 
-  case 15:
+  case 14:
     if (!BC_flag)
     {
       d2 += 1;
@@ -378,7 +364,7 @@ void changeThree()
 { // modify time
   switch (row_k)
   { // select column
-  case 6:
+  case 5:
     if (!BC_flag)
     {
       h1 += 1;
@@ -396,7 +382,7 @@ void changeThree()
     hour = h1 * 10 + h2;
     break;
 
-  case 7:
+  case 6:
     if (!BC_flag)
     {
       h2 += 1;
@@ -414,7 +400,7 @@ void changeThree()
     hour = h1 * 10 + h2;
     break;
 
-  case 9:
+  case 8:
     if (!BC_flag)
     {
       min1 += 1;
@@ -432,7 +418,7 @@ void changeThree()
     minute = min1 * 10 + min2;
     break;
 
-  case 10:
+  case 9:
     if (!BC_flag)
     {
       min2 += 1;
@@ -450,7 +436,7 @@ void changeThree()
     minute = min1 * 10 + min2;
     break;
 
-  case 12:
+  case 11:
     if (!BC_flag)
     {
       s1 += 1;
@@ -468,7 +454,7 @@ void changeThree()
     second = s1 * 10 + s2;
     break;
 
-  case 13:
+  case 12:
     if (!BC_flag)
     {
       s2 += 1;
@@ -495,7 +481,7 @@ void changeFour()
 {
   switch (row_k)
   {
-  case 6:
+  case 5:
     if (!BC_flag)
     {
       mode += 1;
@@ -513,7 +499,7 @@ void changeFour()
     lcd.print(mode);
     break;
 
-  case 15:
+  case 11:
     if (!BC_flag)
     {
       week += 1;
@@ -530,6 +516,31 @@ void changeFour()
     lcd.print(week);
     break;
 
+  case 17:
+    if (!BC_flag)
+    {
+      bled += 1;
+    }
+    else
+    {
+      bled -= 1;
+    }
+    if (bled > 6)
+      bled = 1;
+    if (bled < 1)
+      bled = 6;
+    lcd.setCursor(row_k, col_k);
+    if (bled == 6)
+    {
+      lcd.print("A");
+    }
+    else
+    {
+      lcd.print(bled);
+    }
+
+    break;
+
   default:
     break;
   }
@@ -537,12 +548,12 @@ void changeFour()
 
 void setTime()
 {
-  reloj.setSecond(second);  // set second
-  reloj.setMinute(minute);  // set minute
-  reloj.setHour(hour);      // set hour
-  reloj.setDoW(week);       // set week
-  reloj.setDate(date);      // set day
-  reloj.setMonth(month);    // set month
-  reloj.setYear(year);      // set year
-  reloj.setClockMode(ampm); // set 12h(true) or 24 h(false)
+  reloj.setSecond(second);   // set second
+  reloj.setMinute(minute);   // set minute
+  reloj.setHour(hour);       // set hour
+  reloj.setDoW(week);        // set week
+  reloj.setDate(date);       // set day
+  reloj.setMonth(month);     // set month
+  reloj.setYear(year);       // set year
+  reloj.setClockMode(false); // set 12h(true) or 24 h(false)
 }
