@@ -54,6 +54,12 @@ void BigClock()
   {
     hour = reloj.getHour(h12Flag, pmFlag);
   }
+  else
+  {
+    HourFormat12(); // Convert to 12H, only for show on bigclock
+    h12Flag = true;
+  }
+
   h1 = hour / 10;
   h2 = hour % 10;
   minute = reloj.getMinute();
@@ -301,7 +307,7 @@ void ShowDateInfo()
 
   if (h12Flag)
   {
-    if (pmFlag)
+    if (!pmFlag)
     {
       lcd.setCursor(11, 0);
       lcd.print("PM");
