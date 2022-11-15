@@ -256,7 +256,7 @@ void calibrate()
       // Save on EEPROM
       EEPROM.put(0, ratio);
       delay(100);
-      cal = 0; // Change Flag for braek the while
+      cal = 0; // Change Flag for break the while
       lcd.print("CAL OK!");
       delay(500);
       lcd.clear();

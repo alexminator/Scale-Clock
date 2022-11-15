@@ -26,10 +26,19 @@ void showDatePage(void)
   {
     lcd.print("0");
   }
+  // Print Values store on EEPROM
   lcd.setCursor(5, 3);
-  lcd.print(mode); // Show 2 mints default info
-  lcd.setCursor(17, 3);
-  lcd.print("A"); // Show AUTO LCD Bright
+  lcd.print(mode); // Show EEPROM time info
+  if (bled == 6)
+  {
+    lcd.setCursor(17, 3);
+    lcd.print("A"); // Show Auto value
+  }
+  else
+  {
+    lcd.setCursor(17, 3);
+    lcd.print(bled); // Show EEPROM LCD Bright
+  }
 
   while (true)
   {
@@ -239,8 +248,6 @@ void showDate()
   }
   lcd.setCursor(13, 2);
   lcd.print(" ");
-
-  
 }
 
 void changeTwo()
@@ -497,6 +504,7 @@ void changeFour()
       mode = 5;
     lcd.setCursor(row_k, col_k);
     lcd.print(mode);
+    EEPROM.put(20, mode); // Put time info on EEPROM
     break;
 
   case 11:
@@ -538,7 +546,7 @@ void changeFour()
     {
       lcd.print(bled);
     }
-
+    EEPROM.put(10, bled); // Put value brigth on EEPROM
     break;
 
   default:
