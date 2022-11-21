@@ -63,6 +63,7 @@ float weight_gr;
 float weight_oz;
 float weight_kg;
 int known_weight[4] = {50, 100, 500, 1000}; // Change with knowning weight
+bool scale_flag = false;                    // false is pricing scale,true is counting scale
 
 // The two LEDs are connected to A1 and A2. Turning analog pin into digital pin
 const int LED1 = A1;
@@ -110,8 +111,7 @@ int y1, y2, mon1, mon2, d1, d2, h1, h2, min1, min2, s1, s2, t1, t2, t3, t4, conv
 float temp;
 int alarm_h1, alarm_h2, alarm_m1, alarm_m2, alarm_s1, alarm_s2;
 int alarm_hh1, alarm_hh2, alarm_mm1, alarm_mm2;
-bool BC_flag;            // false selective value plus 1, true sselective value subtracts 1
-bool scale_flag = false; // false is pricing scale,true is counting scale
+bool BC_flag; // false selective value plus 1, true sselective value subtracts 1
 
 String M_arr[12] = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
 String WD_arr[7] = {"Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"};
