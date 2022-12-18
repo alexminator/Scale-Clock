@@ -1,6 +1,5 @@
 void ShowBigClock()
 {
-  lcd.init();
   lcd.clear();
   while (true)
   {
