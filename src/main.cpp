@@ -68,7 +68,7 @@ bool scale_flag = false;                    // false is pricing scale,true is co
 const int LED1 = A1;
 const int LED2 = A2;
 
-//Pins LED for Charge Bar Indicator
+// Pins LED for Charge Bar Indicator
 const int L1R = 7;
 const int L2O = 8;
 const int L3O = 9;
@@ -102,11 +102,17 @@ Keypad myKeypad = Keypad(makeKeymap(keyMap), rowPins, colPins, ROWS, COLS);
 */
 
 // 5 Button Pins
-const int LB = 2;   // Left button
-const int UB = 3;   // Up button
-const int DB = 4;   // Down button
-const int RB = 5;   // Right button
-const int OB = 6;   // Ok button
+char keypressed;  // used to receive the key value
+char UP;          // UP key value
+char DOWN;        // Down key value
+char RIGHT;       // Right key value
+char LEFT;        // Left  key value
+char OK;          // Ok key value
+const int LB = 2; // Left button
+const int UB = 3; // Up button
+const int DB = 4; // Down button
+const int RB = 5; // Right button
+const int OB = 6; // Ok button
 
 // Clock Variables
 byte hr, mn, osec;
@@ -120,7 +126,7 @@ byte alarmHour2, alarmMinute2;
 bool alarmDy = false, alarmH12Flag = false, alarmPmFlag = false;
 byte row_k = 6, col_k = 1, page = 0;
 
-//boolean K0, K1, K2, K3, K4, K5, K6, K7, K8, K9, KA, KB, KC, KD, KE, KF; // key flag
+boolean KA, KB, KC, KD, KF; // key flag
 byte year, month, date, hour, minute, second, week;
 int y1, y2, mon1, mon2, d1, d2, h1, h2, min1, min2, s1, s2, t1, t2, t3, t4, convertemp;
 float temp;
@@ -276,79 +282,52 @@ void loop()
 
 void enter()
 {
-  keypressed = myKeypad.getKey();
+  if (!digitalRead(UB))
+  {
+    keypressed = UP;
+  }
+  else if (!digitalRead(DB))
+  {
+    keypressed = DOWN;
+  }
+  else if (!digitalRead(LB))
+  {
+    keypressed = LEFT;
+  }
+  else if (!digitalRead(RB))
+  {
+    keypressed = RIGHT;
+  }
+  else if (!digitalRead(OB))
+    {
+      keypressed = OK;
+    }
+
   if (keypressed != NO_KEY)
   {
     switch (keypressed)
     {
-    case '1':
-      tone(buzzer, 262, 100);
-      break;
-
-    case '2':
-      tone(buzzer, 293, 100);
-      break;
-
-    case '3':
-      tone(buzzer, 329, 100);
-      break;
-
-    case '4':
-      tone(buzzer, 349, 100);
-      break;
-
-    case '5':
-      tone(buzzer, 392, 100);
-      break;
-
-    case '6':
-      tone(buzzer, 440, 100);
-      break;
-
-    case '7':
-      tone(buzzer, 494, 100);
-      break;
-
-    case '8':
-      tone(buzzer, 523, 100);
-      break;
-
-    case '9':
-      tone(buzzer, 586, 100);
-      break;
-
-    case '0':
-      tone(buzzer, 697, 100);
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      break;
-
-    case 'A':
+    case 'LEFT':
       tone(buzzer, 1045, 100);
       KA = 1;
       break;
 
-    case 'B':
+    case 'UP':
       tone(buzzer, 879, 100);
       KB = 1;
       break;
 
-    case 'C':
+    case 'DOWN':
       tone(buzzer, 987, 100);
       KC = 1;
       break;
 
-    case 'D':
+    case 'RIGHT':
       tone(buzzer, 1971, 100);
       KD = 1;
       break;
 
-    case '*':
-      tone(buzzer, 658, 100);
-      KE = 1;
-      break;
-
-    case '#':
+    case 'OK':
       tone(buzzer, 783, 100);
       KF = 1;
       break;
