@@ -12,16 +12,16 @@
                  +------------| USB |------------+
                  |            +-----+            |
     DOUT HX711   | [X]D13/SCK        MISO/D12[X] |   CLK HX711
-                 | [ ]3.3V           MOSI/D11[ ]~|
-                 | [ ]V.ref     ___    SS/D10[X]~|   BACKLIGHT
-    BUZZER       | [X]A0       / N \       D9[X]~|   KEYPAD
-    LED 1        | [X]A1      /  A  \      D8[X] |   KEYPAD
-    LED 2        | [X]A2      \  N  /      D7[X] |   KEYPAD
-    LDR          | [X]A3       \_0_/       D6[X]~|   KEYPAD
-    I2C          | [X]A4/SDA               D5[X]~|   KEYPAD
-    I2C          | [X]A5/SCL               D4[X] |   KEYPAD
-                 | [ ]A6              INT1/D3[X]~|   KEYPAD
-                 | [ ]A7              INT0/D2[X] |   KEYPAD
+                 | [ ]3.3V           MOSI/D11[X]~|   BACKLIGHT
+                 | [ ]V.ref     ___    SS/D10[X]~|   L4 ORANGE
+    BUZZER       | [X]A0       / N \       D9[X]~|   L3 ORANGE
+    LED 1        | [X]A1      /  A  \      D8[X] |   L2 ORANGE
+    LED 2        | [X]A2      \  N  /      D7[X] |   L1 RED
+    LDR          | [X]A3       \_0_/       D6[X]~|   OK BN
+    I2C          | [X]A4/SDA               D5[X]~|   RIGHT BN
+    I2C          | [X]A5/SCL               D4[X] |   DOWN BN
+    L5 GREEN     | [ ]A6              INT1/D3[X]~|   UP BN
+    L2 GREEN     | [ ]A7              INT0/D2[X] |   LEFT BN
                  | [X]5V                  GND[X] |
                  | [ ]RST                 RST[ ] |
                  | [X]GND   5V MOSI GND   TX1[ ] |
@@ -33,7 +33,6 @@
  */
 // Global Libraries
 #include <Arduino.h>
-#include <Keypad.h>
 #include <DS3231.h> //lib clock
 #include <HX711.h>
 #include <EEPROM.h>
@@ -69,15 +68,23 @@ bool scale_flag = false;                    // false is pricing scale,true is co
 const int LED1 = A1;
 const int LED2 = A2;
 
+//Pins LED for Charge Bar Indicator
+const int L1R = 7;
+const int L2O = 8;
+const int L3O = 9;
+const int L4O = 10;
+const int L5G = A6;
+const int L6G = A7;
+
 // Brightness LCD control using LDR
 const int LDR_PIN = A3;
-const int BACKLIGHT_PIN = 10; // PWM Pin
+const int BACKLIGHT_PIN = 11; // PWM Pin
 int ldr, bri;
 int bled; // LCD Bright AUTO mode
 
 // Buzzer Pin
 const int buzzer = A0;
-
+/*
 // KeyPad Variables
 const byte ROWS = 4; // four rows
 const byte COLS = 4; // four columns
@@ -92,6 +99,14 @@ char keyMap[ROWS][COLS] = {
 byte rowPins[ROWS] = {2, 3, 4, 5}; // Row pinouts of the keypad
 byte colPins[COLS] = {6, 7, 8, 9}; // Column pinouts of the keypad
 Keypad myKeypad = Keypad(makeKeymap(keyMap), rowPins, colPins, ROWS, COLS);
+*/
+
+// 5 Button Pins
+const int LB = 2;   // Left button
+const int UB = 3;   // Up button
+const int DB = 4;   // Down button
+const int RB = 5;   // Right button
+const int OB = 6;   // Ok button
 
 // Clock Variables
 byte hr, mn, osec;
@@ -105,7 +120,7 @@ byte alarmHour2, alarmMinute2;
 bool alarmDy = false, alarmH12Flag = false, alarmPmFlag = false;
 byte row_k = 6, col_k = 1, page = 0;
 
-boolean K0, K1, K2, K3, K4, K5, K6, K7, K8, K9, KA, KB, KC, KD, KE, KF; // key flag
+//boolean K0, K1, K2, K3, K4, K5, K6, K7, K8, K9, KA, KB, KC, KD, KE, KF; // key flag
 byte year, month, date, hour, minute, second, week;
 int y1, y2, mon1, mon2, d1, d2, h1, h2, min1, min2, s1, s2, t1, t2, t3, t4, convertemp;
 float temp;
@@ -169,6 +184,11 @@ void setup()
   pinMode(LED2, OUTPUT);
   pinMode(LDR_PIN, INPUT_PULLUP);
   pinMode(BACKLIGHT_PIN, OUTPUT);
+  pinMode(LB, INPUT_PULLUP);
+  pinMode(UB, INPUT_PULLUP);
+  pinMode(DB, INPUT_PULLUP);
+  pinMode(RB, INPUT_PULLUP);
+  pinMode(OB, INPUT_PULLUP);
 
   lcd.init();      // initialize LCD
   lcd.backlight(); // set the backlight of LCD on
@@ -229,7 +249,7 @@ void setup()
 
 void loop()
 {
-  /* press 'D' key to switch page
+  /* press 'Right' key to switch page
      when page is 0, display CLOCK
      when page is 1, show the page of alarm setting
      when page is 2, show the page of digital scale
