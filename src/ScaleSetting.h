@@ -161,8 +161,10 @@ void showScaleOne()
   }
 }
 
+
 void changeScaleOne()
 {
+  /*
   if (keypressed == '0' || keypressed == '1' || keypressed == '2' || keypressed == '3' ||
       keypressed == '4' || keypressed == '5' || keypressed == '6' || keypressed == '7' ||
       keypressed == '8' || keypressed == '9')
@@ -198,7 +200,9 @@ void changeScaleOne()
       break;
     }
   }
+  */
 }
+
 
 void calibrate()
 {

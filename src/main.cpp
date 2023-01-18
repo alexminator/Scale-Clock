@@ -69,12 +69,10 @@ const int LED1 = A1;
 const int LED2 = A2;
 
 // Pins LED for Charge Bar Indicator
-const int L1R = 7;
-const int L2O = 8;
-const int L3O = 9;
-const int L4O = 10;
-const int L5G = A6;
-const int L6G = A7;
+const int L1R = 8;
+const int L2O = 9;
+const int L3O = 10;
+const int L4G = A6;
 
 // Brightness LCD control using LDR
 const int LDR_PIN = A3;
@@ -101,18 +99,14 @@ byte colPins[COLS] = {6, 7, 8, 9}; // Column pinouts of the keypad
 Keypad myKeypad = Keypad(makeKeymap(keyMap), rowPins, colPins, ROWS, COLS);
 */
 
-// 5 Button Pins
-char keypressed;  // used to receive the key value
-char UP;          // UP key value
-char DOWN;        // Down key value
-char RIGHT;       // Right key value
-char LEFT;        // Left  key value
-char OK;          // Ok key value
-const int LB = 2; // Left button
-const int UB = 3; // Up button
-const int DB = 4; // Down button
-const int RB = 5; // Right button
-const int OB = 6; // Ok button
+// 6 Button Pins
+
+byte LB = 2; // Left button
+byte UB = 3; // Up button
+byte DB = 4; // Down button
+byte RB = 5; // Right button
+byte OB = 6; // Ok button
+byte TB = 7; // Calibration button
 
 // Clock Variables
 byte hr, mn, osec;
@@ -125,8 +119,9 @@ byte alarmDay, alarmHour1, alarmMinute1, alarmSecond1, alarmBits = 0x48;
 byte alarmHour2, alarmMinute2;
 bool alarmDy = false, alarmH12Flag = false, alarmPmFlag = false;
 byte row_k = 6, col_k = 1, page = 0;
+boolean KA, KB, KC, KD, KE, KF; // key flag
+const char NO_KEY = '\0';
 
-boolean KA, KB, KC, KD, KF; // key flag
 byte year, month, date, hour, minute, second, week;
 int y1, y2, mon1, mon2, d1, d2, h1, h2, min1, min2, s1, s2, t1, t2, t3, t4, convertemp;
 float temp;
@@ -170,6 +165,7 @@ void ShowInfo();
 void ShowDateInfo();
 bool shouldShowInfo();
 void HourFormat12();
+void anti_debounce(byte boton);
 
 #include "ClockRoutines.h"
 #include "Clock.h"
@@ -188,13 +184,14 @@ void setup()
   // Initialize pins
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
-  pinMode(LDR_PIN, INPUT_PULLUP);
+  pinMode(LDR_PIN, INPUT);
   pinMode(BACKLIGHT_PIN, OUTPUT);
   pinMode(LB, INPUT_PULLUP);
   pinMode(UB, INPUT_PULLUP);
   pinMode(DB, INPUT_PULLUP);
   pinMode(RB, INPUT_PULLUP);
   pinMode(OB, INPUT_PULLUP);
+  pinMode(TB, INPUT_PULLUP);
 
   lcd.init();      // initialize LCD
   lcd.backlight(); // set the backlight of LCD on
@@ -261,7 +258,7 @@ void loop()
      when page is 2, show the page of digital scale
      when page is 3, show clock settings
   */
-
+ 
   if (page == 0)
   {
     ShowBigClock();
@@ -284,56 +281,52 @@ void enter()
 {
   if (!digitalRead(UB))
   {
-    keypressed = UP;
+    anti_debounce(UB);
+    tone(buzzer, 879, 100);
+    KB = 1;
+    Serial.println("Boton UP ");
   }
   else if (!digitalRead(DB))
   {
-    keypressed = DOWN;
+    anti_debounce(DB);
+    tone(buzzer, 987, 100);
+    KC = 1;
+    Serial.println("Boton Down");
   }
   else if (!digitalRead(LB))
   {
-    keypressed = LEFT;
+    anti_debounce(LB);
+    tone(buzzer, 1045, 100);
+    KA = 1;
+    Serial.println("Boton Left");
   }
   else if (!digitalRead(RB))
   {
-    keypressed = RIGHT;
+    anti_debounce(RB);
+    tone(buzzer, 1971, 100);
+    KD = 1;
+    Serial.println("Boton Right");
   }
   else if (!digitalRead(OB))
-    {
-      keypressed = OK;
-    }
-
-  if (keypressed != NO_KEY)
   {
-    switch (keypressed)
-    {
-    case 'LEFT':
-      tone(buzzer, 1045, 100);
-      KA = 1;
-      break;
-
-    case 'UP':
-      tone(buzzer, 879, 100);
-      KB = 1;
-      break;
-
-    case 'DOWN':
-      tone(buzzer, 987, 100);
-      KC = 1;
-      break;
-
-    case 'RIGHT':
-      tone(buzzer, 1971, 100);
-      KD = 1;
-      break;
-
-    case 'OK':
-      tone(buzzer, 783, 100);
-      KF = 1;
-      break;
-
-    default:
-      break;
-    }
+    anti_debounce(OB);
+    tone(buzzer, 783, 100);
+    KF = 1;
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, LOW);
+    Serial.println("Boton OK #");
   }
+  else if (!digitalRead(TB))
+  {
+    anti_debounce(TB);
+    tone(buzzer, 658, 100);
+    KE = 1;
+    Serial.println("Boton Calibra e Info *");
+  }
+}
+
+void anti_debounce(byte boton){
+      delay(100);
+      while(digitalRead(boton)); //Anti-Rebote
+      delay(100);
 }
