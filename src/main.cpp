@@ -235,23 +235,13 @@ void loop()
      when page is 2, show the page of digital scale
      when page is 3, show clock settings
   */
+  switch (page) {
+        case 0: ShowBigClock(); break;
+        case 1: showAlarmPage(); break;
+        case 2: showScalePage(); break;
+        case 3: showDatePage(); break;
+    }
 
-  if (page == 0)
-  {
-    ShowBigClock();
-  }
-  else if (page == 1)
-  {
-    showAlarmPage();
-  }
-  else if (page == 2)
-  {
-    showScalePage();
-  }
-  else if (page == 3)
-  {
-    showDatePage();
-  }
 }
 
 void enter()
