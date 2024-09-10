@@ -123,39 +123,13 @@ unsigned long IntervalInfo;
 unsigned long now = 0;
 unsigned long startCollecting = 0; // Aux variable for Clock information
 
-void showDatePage(void);
-void showDate();
-void showAlarmPage(void);
-void showAlarmStatus();
-void showAlarm1();
-void showAlarm2();
-void showScalePage();
-void showScaleOne();
-void changeScaleOne();
-void calibrate();
-void changeThree();
-void changeTwo();
-void changeFour();
-void changeAlarmOne();
-void changeAlarmTwo();
-void alarm();
-void setTime();
-void enter();
-void ShowBigClock();
-void BigClock();
-void LDR_Sensor();
-void OtherInfo();
-void ShowInfo();
-void ShowDateInfo();
-bool shouldShowInfo();
-void HourFormat12();
-
+#include "Key.h"
+#include "LCDBright.h"
+#include "AlarmSetting.h"
 #include "ClockRoutines.h"
 #include "Clock.h"
 #include "ClockSetting.h"
-#include "AlarmSetting.h"
 #include "ScaleSetting.h"
-#include "LCDBright.h"
 
 void setup()
 {
@@ -235,96 +209,21 @@ void loop()
      when page is 2, show the page of digital scale
      when page is 3, show clock settings
   */
-  switch (page) {
-        case 0: ShowBigClock(); break;
-        case 1: showAlarmPage(); break;
-        case 2: showScalePage(); break;
-        case 3: showDatePage(); break;
-    }
-
-}
-
-void enter()
-{
-  keypressed = myKeypad.getKey();
-  if (keypressed != NO_KEY)
+  switch (page)
   {
-    switch (keypressed)
-    {
-    case '1':
-      tone(buzzer, 262, 100);
-      break;
-
-    case '2':
-      tone(buzzer, 293, 100);
-      break;
-
-    case '3':
-      tone(buzzer, 329, 100);
-      break;
-
-    case '4':
-      tone(buzzer, 349, 100);
-      break;
-
-    case '5':
-      tone(buzzer, 392, 100);
-      break;
-
-    case '6':
-      tone(buzzer, 440, 100);
-      break;
-
-    case '7':
-      tone(buzzer, 494, 100);
-      break;
-
-    case '8':
-      tone(buzzer, 523, 100);
-      break;
-
-    case '9':
-      tone(buzzer, 586, 100);
-      break;
-
-    case '0':
-      tone(buzzer, 697, 100);
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      break;
-
-    case 'A':
-      tone(buzzer, 1045, 100);
-      KA = 1;
-      break;
-
-    case 'B':
-      tone(buzzer, 879, 100);
-      KB = 1;
-      break;
-
-    case 'C':
-      tone(buzzer, 987, 100);
-      KC = 1;
-      break;
-
-    case 'D':
-      tone(buzzer, 1971, 100);
-      KD = 1;
-      break;
-
-    case '*':
-      tone(buzzer, 658, 100);
-      KE = 1;
-      break;
-
-    case '#':
-      tone(buzzer, 783, 100);
-      KF = 1;
-      break;
-
-    default:
-      break;
-    }
+  case 0:
+    ShowBigClock();
+    break;
+  case 1:
+    showAlarmPage();
+    break;
+  case 2:
+    showScalePage();
+    break;
+  case 3:
+    showDatePage();
+    break;
   }
 }
+
+

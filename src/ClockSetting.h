@@ -1,128 +1,3 @@
-void showDatePage(void)
-{
-  lcd.clear();
-
-  // Fixed text
-  lcd.setCursor(3, 0);
-  lcd.print("Clock Settings");
-  lcd.setCursor(0, 1);
-  lcd.print("Date:");
-  lcd.setCursor(0, 2);
-  lcd.print("Time:");
-  lcd.setCursor(0, 3);
-  lcd.print("Info:");
-  lcd.setCursor(7, 3);
-  lcd.print("Day:");
-  lcd.setCursor(13, 3);
-  lcd.print("LCD:");
-  lcd.setCursor(5, 1);
-  lcd.print("2");
-  lcd.setCursor(6, 1);
-  if (century)
-  {
-    lcd.print("1");
-  }
-  else
-  {
-    lcd.print("0");
-  }
-  // Print Values store on EEPROM
-  lcd.setCursor(5, 3);
-  lcd.print(mode); // Show EEPROM time info
-  if (bled == 6)
-  {
-    lcd.setCursor(17, 3);
-    lcd.print("A"); // Show Auto value
-  }
-  else
-  {
-    lcd.setCursor(17, 3);
-    lcd.print(bled); // Show EEPROM LCD Bright
-  }
-
-  while (true)
-  {
-    alarm();    // Activate if you want detect alarm on setting
-    showDate(); // show date
-    enter();    // input
-    LDR_Sensor();
-    if (KA == 1) // time delayed, move cursor
-    {
-      KA = 0; // key flag, clear 0
-      while (true)
-      {
-        enter(); // input
-        if (KA == 1)
-        {
-          KA = 0;
-          row_k += 1;
-          if (row_k > 17)
-          {
-            row_k = 5;
-            col_k += 1;
-            if (col_k > 3)
-            {
-              col_k = 1;
-            }
-          }
-        }
-        lcd.setCursor(row_k, col_k);
-        lcd.blink();
-
-        if (KB == 1)
-        {         // the value plus 1
-          KB = 0; // key flag, clear 0
-          BC_flag = false;
-          if (col_k == 1)
-          { // the second row
-            changeTwo();
-          }
-          else if (col_k == 2)
-          {
-            changeThree(); // the third row
-          }
-          else
-          {
-            changeFour(); // the four row
-          }
-        }
-        if (KC == 1)
-        {         // the vlaue subtracts 1
-          KC = 0; // key flag, clear 0
-          BC_flag = true;
-          if (col_k == 1)
-          { // the second row
-            changeTwo();
-          }
-          else if (col_k == 2)
-          {
-            changeThree(); // the third row
-          }
-          else
-          {
-            changeFour(); // the four row
-          }
-        }
-        if (KF == 1)
-        {
-          KF = 0; // key flag, clear 0
-          setTime();
-          break;
-        }
-      }
-      KD = 0; // D is invalid before exiting
-    }
-    if (KD == 1)
-    {
-      KD = 0;
-      page = 0;
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      break;
-    }
-  }
-}
-
 void showDate()
 {
   // Show Clock of settings.
@@ -565,3 +440,129 @@ void setTime()
   reloj.setYear(year);       // set year
   reloj.setClockMode(false); // set 12h(true) or 24 h(false). This must be first than hour
 }
+
+void showDatePage(void)
+{
+  lcd.clear();
+
+  // Fixed text
+  lcd.setCursor(3, 0);
+  lcd.print("Clock Settings");
+  lcd.setCursor(0, 1);
+  lcd.print("Date:");
+  lcd.setCursor(0, 2);
+  lcd.print("Time:");
+  lcd.setCursor(0, 3);
+  lcd.print("Info:");
+  lcd.setCursor(7, 3);
+  lcd.print("Day:");
+  lcd.setCursor(13, 3);
+  lcd.print("LCD:");
+  lcd.setCursor(5, 1);
+  lcd.print("2");
+  lcd.setCursor(6, 1);
+  if (century)
+  {
+    lcd.print("1");
+  }
+  else
+  {
+    lcd.print("0");
+  }
+  // Print Values store on EEPROM
+  lcd.setCursor(5, 3);
+  lcd.print(mode); // Show EEPROM time info
+  if (bled == 6)
+  {
+    lcd.setCursor(17, 3);
+    lcd.print("A"); // Show Auto value
+  }
+  else
+  {
+    lcd.setCursor(17, 3);
+    lcd.print(bled); // Show EEPROM LCD Bright
+  }
+
+  while (true)
+  {
+    alarm();    // Activate if you want detect alarm on setting
+    showDate(); // show date
+    enter();    // input
+    LDR_Sensor();
+    if (KA == 1) // time delayed, move cursor
+    {
+      KA = 0; // key flag, clear 0
+      while (true)
+      {
+        enter(); // input
+        if (KA == 1)
+        {
+          KA = 0;
+          row_k += 1;
+          if (row_k > 17)
+          {
+            row_k = 5;
+            col_k += 1;
+            if (col_k > 3)
+            {
+              col_k = 1;
+            }
+          }
+        }
+        lcd.setCursor(row_k, col_k);
+        lcd.blink();
+
+        if (KB == 1)
+        {         // the value plus 1
+          KB = 0; // key flag, clear 0
+          BC_flag = false;
+          if (col_k == 1)
+          { // the second row
+            changeTwo();
+          }
+          else if (col_k == 2)
+          {
+            changeThree(); // the third row
+          }
+          else
+          {
+            changeFour(); // the four row
+          }
+        }
+        if (KC == 1)
+        {         // the vlaue subtracts 1
+          KC = 0; // key flag, clear 0
+          BC_flag = true;
+          if (col_k == 1)
+          { // the second row
+            changeTwo();
+          }
+          else if (col_k == 2)
+          {
+            changeThree(); // the third row
+          }
+          else
+          {
+            changeFour(); // the four row
+          }
+        }
+        if (KF == 1)
+        {
+          KF = 0; // key flag, clear 0
+          setTime();
+          break;
+        }
+      }
+      KD = 0; // D is invalid before exiting
+    }
+    if (KD == 1)
+    {
+      KD = 0;
+      page = 0;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      break;
+    }
+  }
+}
+

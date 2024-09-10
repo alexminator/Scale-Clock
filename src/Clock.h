@@ -1,48 +1,68 @@
-void ShowBigClock()
+void HourFormat12()
 {
-  lcd.clear();
-  while (true)
-  {
-    alarm(); // detect alarm
-    LDR_Sensor();
-    if (shouldShowInfo())
-    {
-      ShowInfo();
-    }
-    else
-    {
-      ShowDateInfo();
-    }
-    BigClock();
-    enter();
+  hour = reloj.getHour(h12Flag, pmFlag);
 
-    if (KE == 1) // Show other info sub screen. Temp & voltage of batt
-    {
-      KE = 0;
-      OtherInfo();
-      break;
-    }
-    if (KD == 1) // Power off LED 1 or LED 2 alarm and change page
-    {
-      KD = 0;
-      page = 1;
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      break;
-    }
-    if (KB == 1) // Show hour in 12H mode
-    {
-      KB = 0;
-      HourFormat12(); // Convert to 12H, only for show on bigclock
-      h12Flag = true;
-      break;
-    }
-    if (KC == 1) // Return to 24H mode
-    {
-      KC = 0;
-      hour = reloj.getHour(h12Flag, pmFlag); // Get hour 24H format
-      break;
-    }
+  if (hour == 0)
+  {
+    hour = 12;     // 12 Midnight
+    pmFlag = true; // Set AM
+  }
+  else if (hour >= 1 && hour < 12)
+  {
+    pmFlag = true; // Set AM
+  }
+  else if (hour > 12)
+  {
+    hour = hour - 12;
+    pmFlag = false; // Set PM
+  }else
+  {
+    pmFlag = false; // Set PM
+  }
+}
+
+void ShowInfo()
+{
+  if (!isClockInfoShown)
+  {
+    startCollecting = millis();
+    isClockInfoShown = true;
+  }
+  lcd.setCursor(0, 0);
+  lcd.print("             "); // Clean info
+
+  // Display the temperature
+  if (reloj.getTemperature() < 10)
+  {
+    lcd.setCursor(0, 0);
+    lcd.print(" ");
+    lcd.setCursor(0, 0);
+    lcd.print(reloj.getTemperature(), 1);
+  }
+  else
+  {
+    lcd.setCursor(0, 0);
+    lcd.print(reloj.getTemperature(), 1);
+  }
+  lcd.setCursor(4, 0);
+  lcd.print(char(223)); // Degree ASCII
+  lcd.print(char(67));  // C capital ASCII
+
+  //  Show alarm status.
+  lcd.setCursor(8, 0);
+  lcd.print("A1");
+  lcd.setCursor(11, 0);
+  lcd.print("A2");
+
+  if (reloj.checkAlarmEnabled(1))
+  {
+    lcd.setCursor(7, 0);
+    lcd.print(char(126));
+  }
+  if (reloj.checkAlarmEnabled(2))
+  {
+    lcd.setCursor(10, 0);
+    lcd.print(char(126));
   }
 }
 
@@ -238,50 +258,7 @@ void OtherInfo()
   }
 }
 
-void ShowInfo()
-{
-  if (!isClockInfoShown)
-  {
-    startCollecting = millis();
-    isClockInfoShown = true;
-  }
-  lcd.setCursor(0, 0);
-  lcd.print("             "); // Clean info
 
-  // Display the temperature
-  if (reloj.getTemperature() < 10)
-  {
-    lcd.setCursor(0, 0);
-    lcd.print(" ");
-    lcd.setCursor(0, 0);
-    lcd.print(reloj.getTemperature(), 1);
-  }
-  else
-  {
-    lcd.setCursor(0, 0);
-    lcd.print(reloj.getTemperature(), 1);
-  }
-  lcd.setCursor(4, 0);
-  lcd.print(char(223)); // Degree ASCII
-  lcd.print(char(67));  // C capital ASCII
-
-  //  Show alarm status.
-  lcd.setCursor(8, 0);
-  lcd.print("A1");
-  lcd.setCursor(11, 0);
-  lcd.print("A2");
-
-  if (reloj.checkAlarmEnabled(1))
-  {
-    lcd.setCursor(7, 0);
-    lcd.print(char(126));
-  }
-  if (reloj.checkAlarmEnabled(2))
-  {
-    lcd.setCursor(10, 0);
-    lcd.print(char(126));
-  }
-}
 
 void ShowDateInfo()
 {
@@ -329,27 +306,54 @@ void ShowDateInfo()
   }
 }
 
-void HourFormat12()
-{
-  hour = reloj.getHour(h12Flag, pmFlag);
 
-  if (hour == 0)
+
+void ShowBigClock()
+{
+  lcd.clear();
+  while (true)
   {
-    hour = 12;     // 12 Midnight
-    pmFlag = true; // Set AM
+    alarm(); // detect alarm
+    LDR_Sensor();
+    if (shouldShowInfo())
+    {
+      ShowInfo();
+    }
+    else
+    {
+      ShowDateInfo();
+    }
+    BigClock();
+    enter();
+
+    if (KE == 1) // Show other info sub screen. Temp & voltage of batt
+    {
+      KE = 0;
+      OtherInfo();
+      break;
+    }
+    if (KD == 1) // Power off LED 1 or LED 2 alarm and change page
+    {
+      KD = 0;
+      page = 1;
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      break;
+    }
+    if (KB == 1) // Show hour in 12H mode
+    {
+      KB = 0;
+      HourFormat12(); // Convert to 12H, only for show on bigclock
+      h12Flag = true;
+      break;
+    }
+    if (KC == 1) // Return to 24H mode
+    {
+      KC = 0;
+      hour = reloj.getHour(h12Flag, pmFlag); // Get hour 24H format
+      break;
+    }
   }
-  else if (hour >= 1 && hour < 12)
-  {
-    pmFlag = true; // Set AM
-  }
-  else if (hour > 12)
-  {
-    hour = hour - 12;
-    pmFlag = false; // Set PM
-  }else
-  {
-    pmFlag = false; // Set PM
-  }
-  
-  
 }
+
+

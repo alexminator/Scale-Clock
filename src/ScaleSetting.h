@@ -1,69 +1,3 @@
-void showScalePage()
-{
-  hx.tare();
-
-  while (page == 2)
-  {
-    if (!scale_flag)
-    {
-      lcd.init();
-      lcd.clear();
-      while (true)
-      {
-        showScaleOne();
-        enter();
-        LDR_Sensor();
-        if (KA == 1)
-        {
-          KA = 0;
-          row_k = 2;
-          col_k = 3;
-          while (true)
-          {
-            enter(); // input
-            if (KA == 1)
-            {
-              KA = 0;
-              row_k += 1;
-              if (row_k > 6)
-              {
-                row_k = 2;
-              }
-            }
-            lcd.setCursor(row_k, col_k);
-            lcd.blink();
-            changeScaleOne();
-            if (KF == 1)
-            {
-              KF = 0;
-              break;
-            }
-          }
-        }
-
-        if (KD == 1)
-        {
-          KD = 0;
-          page = 3;
-          break;
-        }
-        if (KE == 1)
-        { // press * to calibrate
-          KE = 0;
-          calibrate(); // The screen shows calibartion routine
-        }
-        if (KF == 1)
-        { // press # to deduct tare. The screen will show 0, if 0 doesn't appear on screen
-          KF = 0;
-          hx.tare(); // subtract tare and read the offset
-          // hx.set_offset(offset);  // set the read offset
-          // EEPROM.put(8, offset);
-        }
-      }
-    }
-  }
-}
-
 void showScaleOne()
 {
   // Fix text
@@ -263,3 +197,71 @@ void calibrate()
     }
   }
 }
+
+void showScalePage()
+{
+  hx.tare();
+
+  while (page == 2)
+  {
+    if (!scale_flag)
+    {
+      lcd.init();
+      lcd.clear();
+      while (true)
+      {
+        showScaleOne();
+        enter();
+        LDR_Sensor();
+        if (KA == 1)
+        {
+          KA = 0;
+          row_k = 2;
+          col_k = 3;
+          while (true)
+          {
+            enter(); // input
+            if (KA == 1)
+            {
+              KA = 0;
+              row_k += 1;
+              if (row_k > 6)
+              {
+                row_k = 2;
+              }
+            }
+            lcd.setCursor(row_k, col_k);
+            lcd.blink();
+            changeScaleOne();
+            if (KF == 1)
+            {
+              KF = 0;
+              break;
+            }
+          }
+        }
+
+        if (KD == 1)
+        {
+          KD = 0;
+          page = 3;
+          break;
+        }
+        if (KE == 1)
+        { // press * to calibrate
+          KE = 0;
+          calibrate(); // The screen shows calibartion routine
+        }
+        if (KF == 1)
+        { // press # to deduct tare. The screen will show 0, if 0 doesn't appear on screen
+          KF = 0;
+          hx.tare(); // subtract tare and read the offset
+          // hx.set_offset(offset);  // set the read offset
+          // EEPROM.put(8, offset);
+        }
+      }
+    }
+  }
+}
+
+
