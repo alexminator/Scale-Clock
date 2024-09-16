@@ -42,6 +42,7 @@
 #include <avr/pgmspace.h> //lib clock
 #include <SPI.h>          //lib clock
 #include <LiquidCrystal_I2C.h>
+
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 // intro progressBAR glyph
@@ -123,6 +124,37 @@ unsigned long IntervalInfo;
 unsigned long now = 0;
 unsigned long startCollecting = 0; // Aux variable for Clock information
 
+// Battery
+#define BATTERYPIN A6
+float averageread = 0;
+// define custom characters/arrays - every character is 5x8 "pixels"
+byte gauge_empty[8] =  {B11111, B00000, B00000, B00000, B00000, B00000, B00000, B11111};    // empty middle piece
+byte gauge_fill_1[8] = {B11111, B10000, B10000, B10000, B10000, B10000, B10000, B11111};    // filled gauge - 1 column
+byte gauge_fill_2[8] = {B11111, B11000, B11000, B11000, B11000, B11000, B11000, B11111};    // filled gauge - 2 columns
+byte gauge_fill_3[8] = {B11111, B11100, B11100, B11100, B11100, B11100, B11100, B11111};    // filled gauge - 3 columns
+byte gauge_fill_4[8] = {B11111, B11110, B11110, B11110, B11110, B11110, B11110, B11111};    // filled gauge - 4 columns
+byte gauge_fill_5[8] = {B11111, B11111, B11111, B11111, B11111, B11111, B11111, B11111};    // filled gauge - 5 columns
+byte gauge_left[8] =   {B11111, B10000, B10000, B10000, B10000, B10000, B10000, B11111};    // left part of gauge - empty
+byte gauge_right[8] =  {B11110, B00010, B00011, B00001, B00001, B00011, B00010, B11110};    // right part of gauge - empty
+
+byte gauge_mask_left[8] = {B11111, B11111, B11111, B11111, B11111, B11111, B11111, B11111};  // mask for rounded corners for leftmost character
+byte gauge_mask_right[8] = {B11110, B11110, B11111, B11111, B11111, B11111, B11110, B11110}; // mask for rounded corners for rightmost character
+
+byte warning_icon[8] = {B00100, B00100, B01110, B01010, B11011, B11111, B11011, B11111};     // warning icon - just because we still have one custom character left
+
+byte gauge_left_dynamic[8];   // left part of gauge dynamic - will be set in the loop function
+byte gauge_right_dynamic[8];  // right part of gauge dynamic - will be set in the loop function
+
+int batt_gauge = 0;       // value for the Battery gauge
+char buffer[16];         // helper buffer to store C-style strings (generated with sprintf function)
+int move_offset = 0;     // used to shift bits for the custom characters
+
+const int gauge_size_chars = 16;       // width of the gauge in number of characters
+char gauge_string[gauge_size_chars + 1]; // string that will include all the gauge character to be printed
+
+
+#include "ReadBatt.h"
+#include "Battanimation.h"
 #include "Key.h"
 #include "LCDBright.h"
 #include "AlarmSetting.h"
@@ -133,6 +165,16 @@ unsigned long startCollecting = 0; // Aux variable for Clock information
 
 void setup()
 {
+  	 // Request INTERNAL 1v1 reference voltage (for ATMega328P)
+	 analogReference (EXTERNAL);
+
+	 // That request is not honoured until we read the analog pin
+	 // so force voltage reference to be turned on
+	 analogRead (BATTERYPIN);
+
+    // Start the serial interface
+  Serial.begin(9600);
+
   // Get value from EEPROM
   EEPROM.get(0, ratio); // Get scale ratio.int value 2 bytes
   EEPROM.get(10, bled); // Get time led LCD_BACKLIGHT. int value 2 bytes
@@ -147,13 +189,18 @@ void setup()
   lcd.init();      // initialize LCD
   lcd.backlight(); // set the backlight of LCD on
 
+  // Animation battery charge
+  lcd.createChar(7, gauge_empty);   // middle empty gauge
+  lcd.createChar(1, gauge_fill_1);  // filled gauge - 1 column
+  lcd.createChar(2, gauge_fill_2);  // filled gauge - 2 columns
+  lcd.createChar(3, gauge_fill_3);  // filled gauge - 3 columns
+  lcd.createChar(4, gauge_fill_4);  // filled gauge - 4 columns
+  lcd.createChar(0, warning_icon); // warning icon - just because we have one more custom character that we could use
+
   analogWrite(BACKLIGHT_PIN, 255); // Max Bright on intro.
 
   // Start the I2C interface
   Wire.begin();
-
-  // Start the serial interface
-  Serial.begin(9600);
 
   // Init HX
   hx.begin(DOUT, CLK);
@@ -209,6 +256,7 @@ void loop()
      when page is 2, show the page of digital scale
      when page is 3, show clock settings
   */
+ 
   switch (page)
   {
   case 0:
@@ -224,6 +272,7 @@ void loop()
     showDatePage();
     break;
   }
+ 
 }
 
 

@@ -1,3 +1,7 @@
+float mapFloat(float x, float in_min, float in_max, float out_min, float out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 void HourFormat12()
 {
   hour = reloj.getHour(h12Flag, pmFlag);
@@ -217,6 +221,8 @@ void OtherInfo()
     alarm(); // detect alarm
     LDR_Sensor();
     enter();
+    BatteryVoltageReader();
+
 
     // Display the temperature
     temp = reloj.getTemperature();
@@ -227,6 +233,7 @@ void OtherInfo()
     // t4 = (convertemp/1) %10;
 
     // Print temperature
+    /*
     printNum3(t1, 0, 1);
     printNum3(t2, 3, 1);
     lcd.setCursor(6, 3);
@@ -236,10 +243,16 @@ void OtherInfo()
     lcd.print("Temp ");
     lcd.print(char(223)); // Degree ASCII
     lcd.print(char(67));  // C capital ASCII
+    */
 
     // Battery
     // Empty Batt
-    printNum4(0, 17);
+    Serial.println("Batt voltage is " + String(averageread));
+    batt_gauge = mapFloat(averageread, 3.0, 4.0, 0, 100);
+    Serial.println(batt_gauge);
+    //lcd.setCursor(11, 0);
+    //lcd.print(averageread);
+    anibatt();
 
     if (KE == 1) // Back to BigClock
     {
