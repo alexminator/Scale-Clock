@@ -12,16 +12,16 @@
                  +------------| USB |------------+
                  |            +-----+            |
     DOUT HX711   | [X]D13/SCK        MISO/D12[X] |   CLK HX711
-                 | [ ]3.3V           MOSI/D11[ ]~|
-                 | [ ]V.ref     ___    SS/D10[X]~|   BACKLIGHT
+                 | [X]3.3V           MOSI/D11[ ]~|
+                 | [X]V.ref     ___    SS/D10[X]~|   BACKLIGHT
     BUZZER       | [X]A0       / N \       D9[X]~|   KEYPAD
     LED 1        | [X]A1      /  A  \      D8[X] |   KEYPAD
     LED 2        | [X]A2      \  N  /      D7[X] |   KEYPAD
     LDR          | [X]A3       \_0_/       D6[X]~|   KEYPAD
     I2C          | [X]A4/SDA               D5[X]~|   KEYPAD
     I2C          | [X]A5/SCL               D4[X] |   KEYPAD
-                 | [ ]A6              INT1/D3[X]~|   KEYPAD
-                 | [ ]A7              INT0/D2[X] |   KEYPAD
+    BATT READ    | [X]A6              INT1/D3[X]~|   KEYPAD
+    POWER DETECT | [X]A7              INT0/D2[X] |   KEYPAD
                  | [X]5V                  GND[X] |
                  | [ ]RST                 RST[ ] |
                  | [X]GND   5V MOSI GND   TX1[ ] |
@@ -116,6 +116,7 @@ bool BC_flag; // false selective value plus 1, true sselective value subtracts 1
 
 String M_arr[12] = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
 String WD_arr[7] = {"Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"};
+String day, monthName;
 
 // Time info variables
 int mode; // Time to show other info. Min 2 mint.
@@ -152,6 +153,13 @@ int move_offset = 0;     // used to shift bits for the custom characters
 const int gauge_size_chars = 16;       // width of the gauge in number of characters
 char gauge_string[gauge_size_chars + 1]; // string that will include all the gauge character to be printed
 
+// Power detect
+#define POWERPIN A7
+float powersensor = 0;
+int sensorVCC; 
+byte blackoutTimeH, blackoutTimeM;
+String blackoutTimeDate, blackoutTimeMonth;
+bool powerflag; // True, there's 5v power from supply. False a blackout event happens
 
 #include "ReadBatt.h"
 #include "Battanimation.h"
@@ -162,10 +170,11 @@ char gauge_string[gauge_size_chars + 1]; // string that will include all the gau
 #include "Clock.h"
 #include "ClockSetting.h"
 #include "ScaleSetting.h"
+#include "Blackout.h"
 
 void setup()
 {
-  	 // Request INTERNAL 1v1 reference voltage (for ATMega328P)
+   // Request EXTERNAL reference voltage (for ATMega328P). Jump 3v3 with AREF.
 	 analogReference (EXTERNAL);
 
 	 // That request is not honoured until we read the analog pin
@@ -179,6 +188,8 @@ void setup()
   EEPROM.get(0, ratio); // Get scale ratio.int value 2 bytes
   EEPROM.get(10, bled); // Get time led LCD_BACKLIGHT. int value 2 bytes
   EEPROM.get(20, mode); // Get Time info mode. int value 2 bytes
+  EEPROM.get(30, blackoutDate); // Get date blackout event. int value 2 bytes
+  EEPROM.get(40, blackoutTime); // Get time blackout event. int value 2 bytes
 
   // Initialize pins
   pinMode(LED1, OUTPUT);

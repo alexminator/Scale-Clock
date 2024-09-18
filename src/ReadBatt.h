@@ -51,7 +51,7 @@ float movingAverage(float value)
 
 float BatteryVoltageReader() {
 float Vref = readVcc()/1000;
-int sensor = analogRead(BATTERYPIN);          // realizar la lectura A1
+int sensor = analogRead(BATTERYPIN);          // realizar la lectura A6
 float value = (float)sensor * Vref / 1024;
 averageread = movingAverage(value);
 return averageread;

@@ -281,8 +281,9 @@ void ShowDateInfo()
   // Data Show
   // and the day of the week
   week = reloj.getDoW();
+  day = WD_arr[week - 1];
   lcd.setCursor(0, 0);
-  lcd.print(WD_arr[week - 1]);
+  lcd.print(day);
 
   // first the date
   date = reloj.getDate();
@@ -291,8 +292,9 @@ void ShowDateInfo()
 
   // then the month
   month = reloj.getMonth(century);
+  monthName = M_arr[month - 1];
   lcd.setCursor(7, 0);
-  lcd.print(M_arr[month - 1]); // Minus one, arrays begins in 0
+  lcd.print(monthName); // Minus one, arrays begins in 0
 
   if (h12Flag)
   {

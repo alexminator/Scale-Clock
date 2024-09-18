@@ -72,18 +72,4 @@ void anibatt()
   lcd.setCursor(0, 1);             // move the cursor to the next line
   lcd.print(gauge_string);         // display the gauge
 
-
-/*
-  if (Serial.available() > 0) {  // some data is available in the serial buffer
-
-    parsed_int_from_serial = Serial.parseInt();  // read the integer value from the buffer
-    if (parsed_int_from_serial != 0) {
-      cpu_gauge = parsed_int_from_serial;
-      Serial.print("Gauge value: ");
-      Serial.println(parsed_int_from_serial);      // send the same value back using the serial port
-    }
-  }
-*/
-
-  //delay(100);  // wait for a while - 100ms = update the screen 10x in a second
 }
