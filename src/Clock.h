@@ -92,6 +92,12 @@ void BigClock()
   s1 = second / 10;
   s2 = second % 10;
 
+  //info for save blackout event
+  week = reloj.getDoW();
+  day = WD_arr[week - 1];
+  month = reloj.getMonth(century);
+  monthName = M_arr[month - 1];
+
   // Change info every mode time. Mode = 2 to 5 mints
 
   if (mode == 2)
@@ -247,12 +253,61 @@ void OtherInfo()
 
     // Battery
     // Empty Batt
-    Serial.println("Batt voltage is " + String(averageread));
+    //Serial.println("Batt voltage is " + String(averageread));
     batt_gauge = mapFloat(averageread, 3.0, 4.0, 0, 100);
-    Serial.println(batt_gauge);
+    //Serial.println(batt_gauge);
     //lcd.setCursor(11, 0);
     //lcd.print(averageread);
-    anibatt();
+    //anibatt();
+
+    //Blackout data
+    blackoutTimeH = EEPROM.get(30, blackoutTimeH);
+    blackoutTimeM = EEPROM.get(40, blackoutTimeM);
+    blackoutTimeDate = EEPROM.get(50, blackoutTimeDate); 
+    blackoutTimeDay = EEPROM.get(60, blackoutTimeDay);
+    blackoutTimeMonth = EEPROM.get(70, blackoutTimeMonth);
+    lcd.setCursor(0, 1);
+    lcd.print("OFF:");
+    lcd.setCursor(4, 1);
+    lcd.print(blackoutTimeH);
+    lcd.setCursor(6, 1);
+    lcd.print(":");
+    lcd.setCursor(7, 1);
+    lcd.print(blackoutTimeM);
+    lcd.setCursor(9, 1);
+    lcd.print("-");
+    lcd.setCursor(10, 1);
+    lcd.print(blackoutTimeDay);
+    lcd.setCursor(14, 1);
+    lcd.print(blackoutTimeDate);
+    lcd.setCursor(16, 1);
+    lcd.print(" ");
+    lcd.setCursor(17, 1);
+    lcd.print(blackoutTimeMonth);
+    // Power on data
+    poweronTimeH = EEPROM.get(80, poweronTimeH);
+    poweronTimeM = EEPROM.get(90, poweronTimeM);
+    poweronTimeDate = EEPROM.get(100, poweronTimeDate);
+    poweronTimeDay = EEPROM.get(110, poweronTimeDay);
+    poweronTimeMonth = EEPROM.get(120, poweronTimeMonth);
+    lcd.setCursor(0, 2);
+    lcd.print("ON :");
+    lcd.setCursor(4, 2);
+    lcd.print(poweronTimeH);
+    lcd.setCursor(6, 2);
+    lcd.print(":");
+    lcd.setCursor(7, 2);
+    lcd.print(poweronTimeM);
+    lcd.setCursor(9, 2);
+    lcd.print("-");
+    lcd.setCursor(10, 2);
+    lcd.print(poweronTimeDay);
+    lcd.setCursor(14, 2);
+    lcd.print(poweronTimeDate);
+    lcd.setCursor(16, 2);
+    lcd.print(" ");
+    lcd.setCursor(17, 2);
+    lcd.print(poweronTimeMonth);
 
     if (KE == 1) // Back to BigClock
     {
@@ -321,6 +376,21 @@ void ShowDateInfo()
   }
 }
 
+void PowerInfo (){
+lcd.setCursor(0, 0);
+  lcd.print("             "); // Clean info
+  if (!powerflag)
+  {
+    lcd.setCursor(0, 0);
+    lcd.print("Using battery");
+  }else
+  {
+    lcd.setCursor(0, 0);
+    lcd.print("Battery charging");
+  }
+  
+}
+
 
 
 void ShowBigClock()
@@ -330,6 +400,30 @@ void ShowBigClock()
   {
     alarm(); // detect alarm
     LDR_Sensor();
+    BigClock();
+    enter();
+    currentMillis = millis();
+    // Verifica si ha pasado el tiempo de actualización
+    if (currentMillis - startMillis >= refresh)
+    {
+      startMillis = currentMillis;            // Actualiza el tiempo anterior
+      acdetect();                             // Llama a la función para detectar la alimentación
+      // Solo llama a datablackout si powerflag es falso y no ha sido llamado antes
+      if (!powerflag && !blackoutTriggered) 
+      {
+        datablackout();
+        blackoutTriggered = true; // Marca que se ha activado datablackout
+        powerOnTriggered = false; // Restablece la bandera de poweron
+      }
+      else if (powerflag && !powerOnTriggered)
+      {
+        datapoweron();
+        powerOnTriggered = true; // Marca que se ha activado datapoweron
+        blackoutTriggered = false; // Restablece la bandera de blackout
+        Serial.println("Power 5V");
+      }
+    }
+    
     if (shouldShowInfo())
     {
       ShowInfo();
@@ -338,8 +432,7 @@ void ShowBigClock()
     {
       ShowDateInfo();
     }
-    BigClock();
-    enter();
+
 
     if (KE == 1) // Show other info sub screen. Temp & voltage of batt
     {

@@ -1,22 +1,28 @@
-void acdetect(){
-    sensorVCC = analogRead(POWERPIN);
-    powersensor = sensorVCC * (5.00 / 1023);
-    HourFormat12();
-    blackoutTimeH = hour;
-    Serial.println(blackoutTimeH);
-    blackoutTimeM = minute;
-    Serial.println(blackoutTimeM);
-    blackoutTimeDate = day;
-    Serial.println(blackoutTimeDate);
-    blackoutTimeMonth = monthName;
-    Serial.println(blackoutTimeMonth);
-    if (powersensor == 0)
-    {
-     // Save on EEPROM
-      EEPROM.put(30, blackoutTimeH);
-      delay(100);
-      EEPROM.put(40, blackoutTimeM);
-      delay(100);
-    }
-    
+void acdetect()
+{
+  sensorVCC = analogRead(POWERPIN);
+  powersensor = sensorVCC * (realVCC / 1023);
+  Serial.println("Power: " + String(powersensor));
+  powerflag = (powersensor > 0.1); //sera true si es mayor que 0.1 si es 0 sera false
+}
+void datablackout()
+{
+  // Save on EEPROM
+  EEPROM.put(30, hour);
+  EEPROM.put(40, minute);
+  EEPROM.put(50, date);
+  EEPROM.put(60, day);
+  EEPROM.put(70, monthName);
+  Serial.println("Datos del evento apagon guardados en EEPROM.");
+}
+
+void datapoweron()
+{
+  // Save on EEPROM
+  EEPROM.put(80, hour);
+  EEPROM.put(90, minute);
+  EEPROM.put(100, date);
+  EEPROM.put(110, day);
+  EEPROM.put(120, monthName);
+  Serial.println("Datos del evento poweron guardados en EEPROM.");
 }
