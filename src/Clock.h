@@ -216,7 +216,6 @@ bool shouldShowInfo()
 
 void OtherInfo()
 {
-  // lcd.init();
   lcd.clear();
   while (true)
   {
@@ -392,26 +391,24 @@ void ShowBigClock()
     LDR_Sensor();
     BigClock();
     enter();
-    //BatteryVoltageReader();
-    //Serial.println("Batt voltage is " + String(powervcc));
     currentMillis = millis();
-    // Verifica si ha pasado el tiempo de actualización
+    // Check if the update time has passed
     if (currentMillis - startMillis >= refresh)
     {
-      startMillis = currentMillis; // Actualiza el tiempo anterior
-      acdetect();                  // Llama a la función para detectar la alimentación
-      // Solo llama a datablackout si powerflag es falso y no ha sido llamado antes
+      startMillis = currentMillis; // Update previous time
+      acdetect();                  // Call function to detect power
+      // Only calls datablackout if powerflag is false and has not been called before
       if (!powerflag && !blackoutTriggered)
       {
         datablackout();
-        blackoutTriggered = true; // Marca que se ha activado datablackout
-        powerOnTriggered = false; // Restablece la bandera de poweron
+        blackoutTriggered = true; // Marks that datablackout has been activated
+        powerOnTriggered = false; // Reset the poweron flag
       }
       else if (powerflag && !powerOnTriggered)
       {
         datapoweron();
-        powerOnTriggered = true;   // Marca que se ha activado datapoweron
-        blackoutTriggered = false; // Restablece la bandera de blackout
+        powerOnTriggered = true;   // Marks that datapoweron has been activated
+        blackoutTriggered = false; // Reset the blackout flag
         Serial.println("Power 5V");
       }
     }

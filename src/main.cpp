@@ -136,8 +136,8 @@ int sensorVCC;
 byte blackoutTimeH, blackoutTimeDate, blackoutTimeM, poweronTimeH, poweronTimeM, poweronTimeDate;
 String blackoutTimeMonth, poweronTimeMonth;
 bool powerflag; // True, there's 5v power from supply. False a blackout event happens
-bool blackoutTriggered = false; // Bandera para controlar la activación de datablackout
-bool powerOnTriggered = false;   // Bandera para controlar la activacion de poweron
+bool blackoutTriggered = false; // Flag to control the activation of datablackout
+bool powerOnTriggered = false;   // Flag to control the activation of poweron
 // Time to sense power
 unsigned long startMillis;
 unsigned long currentMillis;

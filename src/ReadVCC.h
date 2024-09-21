@@ -26,6 +26,5 @@ const float InternalReferenceVoltage = 1.035; // <- as measured (or 1v1 by defau
 
   // Float normally reduces precion but works OK here. Add 0.5 for rounding not truncating.
   powervcc = InternalReferenceVoltage / float (ADC + 0.5) * 1024.0;
-  //Serial.println("Batt voltage is " + String(powervcc));
   return powervcc;
 }

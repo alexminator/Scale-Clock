@@ -136,7 +136,7 @@ void changeScaleOne()
 
 void calibrate()
 {
-  lcd.init(); // initialize LCD1602, avoid cursor flashing
+  lcd.init(); // initialize LCD, avoid cursor flashing
   int i = 0, cal = 1;
   long adc_lecture;
 
