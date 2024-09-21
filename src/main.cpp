@@ -21,7 +21,7 @@
     I2C          | [X]A4/SDA               D5[X]~|   KEYPAD
     I2C          | [X]A5/SCL               D4[X] |   KEYPAD
                  | [ ]A6              INT1/D3[X]~|   KEYPAD
-                 | [ ]A7              INT0/D2[X] |   KEYPAD
+    POWER DETECT | [X]A7              INT0/D2[X] |   KEYPAD
                  | [X]5V                  GND[X] |
                  | [ ]RST                 RST[ ] |
                  | [X]GND   5V MOSI GND   TX1[ ] |
@@ -42,6 +42,7 @@
 #include <avr/pgmspace.h> //lib clock
 #include <SPI.h>          //lib clock
 #include <LiquidCrystal_I2C.h>
+
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 // intro progressBAR glyph
@@ -63,6 +64,7 @@ float weight_gr;
 float weight_oz;
 float weight_kg;
 int known_weight[4] = {50, 100, 500, 1000}; // Change with knowning weight
+bool scale_flag = false;                    // false is pricing scale,true is counting scale
 
 // The two LEDs are connected to A1 and A2. Turning analog pin into digital pin
 const int LED1 = A1;
@@ -72,6 +74,7 @@ const int LED2 = A2;
 const int LDR_PIN = A3;
 const int BACKLIGHT_PIN = 10; // PWM Pin
 int ldr, bri;
+int bled; // LCD Bright AUTO mode
 
 // Buzzer Pin
 const int buzzer = A0;
@@ -96,7 +99,6 @@ byte hr, mn, osec;
 bool century = false;
 bool h12Flag;
 bool pmFlag;
-bool ampm;
 bool FlagInfo = true;
 
 byte alarmDay, alarmHour1, alarmMinute1, alarmSecond1, alarmBits = 0x48;
@@ -110,52 +112,75 @@ int y1, y2, mon1, mon2, d1, d2, h1, h2, min1, min2, s1, s2, t1, t2, t3, t4, conv
 float temp;
 int alarm_h1, alarm_h2, alarm_m1, alarm_m2, alarm_s1, alarm_s2;
 int alarm_hh1, alarm_hh2, alarm_mm1, alarm_mm2;
-bool BC_flag;            // false selective value plus 1, true sselective value subtracts 1
-bool scale_flag = false; // false is pricing scale,true is counting scale
+bool BC_flag; // false selective value plus 1, true sselective value subtracts 1
 
-String Mode_arr[2] = {"12H", "24H"};
-String M_arr[12] = {"Ene-", "Feb-", "Mar-", "Abr-", "May-", "Jun-", "Jul-", "Ago-", "Sep-", "Oct-", "Nov-", "Dic-"};
+String M_arr[12] = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
 String WD_arr[7] = {"Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"};
+String day, monthName;
 
 // Time info variables
-int mode = 2; // Time to show other info. Default 2 mint.
+int mode; // Time to show other info. Min 2 mint.
+bool isClockInfoShown = false;
+unsigned long IntervalInfo;
+unsigned long now = 0;
+unsigned long startCollecting = 0; // Aux variable for Clock information
 
-void showDatePage(void);
-void showDate();
-void showAlarmPage(void);
-void showAlarmStatus();
-void showAlarm1();
-void showAlarm2();
-void showScalePage();
-void showScaleOne();
-void changeScaleOne();
-void calibrate();
-void changeThree();
-void changeTwo();
-void changeFour();
-void changeAlarmOne();
-void changeAlarmTwo();
-void alarm();
-void setTime();
-void enter();
-void ShowBigClock();
-void BigClock();
-void LDR_Sensor();
-void OtherInfo();
-void ShowInfo();
-void ShowDateInfo();
+// Battery
+#define BATTERYPIN A6
+float powervcc;
 
+// Power detect
+#define POWERPIN A7
+float powersensor;
+int sensorVCC;
+byte blackoutTimeH, blackoutTimeDate, blackoutTimeM, poweronTimeH, poweronTimeM, poweronTimeDate;
+String blackoutTimeMonth, poweronTimeMonth;
+bool powerflag; // True, there's 5v power from supply. False a blackout event happens
+bool blackoutTriggered = false; // Flag to control the activation of datablackout
+bool powerOnTriggered = false;   // Flag to control the activation of poweron
+// Time to sense power
+unsigned long startMillis;
+unsigned long currentMillis;
+const unsigned long refresh = 3000UL; // 3 seg Unsigned long
+
+#include "ReadVCC.h"
+#include "Key.h"
+#include "LCDBright.h"
+#include "AlarmSetting.h"
 #include "ClockRoutines.h"
+#include "Blackout.h"
 #include "Clock.h"
 #include "ClockSetting.h"
-#include "AlarmSetting.h"
 #include "ScaleSetting.h"
-#include "LCDBright.h"
 
 void setup()
 {
-  EEPROM.get(0, ratio);
+    // Start the serial interface
+  Serial.begin(9600);
 
+  // Request INTERNAL reference voltage (for ATMega328P). 
+  analogReference(INTERNAL);
+
+  // That request is not honoured until we read the analog pin
+  // so force voltage reference to be turned on
+  analogRead(BATTERYPIN);
+
+  // Get value from EEPROM
+  EEPROM.get(0, ratio);              // Get scale ratio.int value 2 bytes
+  EEPROM.get(10, bled);              // Get time led LCD_BACKLIGHT. int value 2 bytes
+  EEPROM.get(20, mode);              // Get Time info mode. int value 2 bytes
+  // Blackout
+  EEPROM.get(30, blackoutTimeH);     // Get hour blackout event. int value 2 bytes
+  EEPROM.get(40, blackoutTimeM);     // Get minute blackout event. int value 2 bytes
+  EEPROM.get(50, blackoutTimeDate);  // Get date blackout event.
+  EEPROM.get(70, blackoutTimeMonth); // Get month blackout event.
+  // Power its back
+  EEPROM.get(80, poweronTimeH);     // Get hour power on event. int value 2 bytes
+  EEPROM.get(90, poweronTimeM);     // Get minute power on event. int value 2 bytes
+  EEPROM.get(100, poweronTimeDate);  // Get date power on event.
+  EEPROM.get(120, poweronTimeMonth); // Get month power on  event.
+
+  // Initialize pins
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
   pinMode(LDR_PIN, INPUT_PULLUP);
@@ -163,14 +188,10 @@ void setup()
 
   lcd.init();      // initialize LCD
   lcd.backlight(); // set the backlight of LCD on
-
   analogWrite(BACKLIGHT_PIN, 255); // Max Bright on intro.
 
   // Start the I2C interface
   Wire.begin();
-
-  // Start the serial interface
-  Serial.begin(9600);
 
   // Init HX
   hx.begin(DOUT, CLK);
@@ -216,6 +237,8 @@ void setup()
       bb[bc] = pgm_read_byte(&custom[nb][bc]);
     lcd.createChar(nb + 1, bb);
   }
+
+  startMillis = millis(); // initial start time
 }
 
 void loop()
@@ -228,105 +251,19 @@ void loop()
      when page is 3, show clock settings
   */
 
-  if (page == 0)
+  switch (page)
   {
+  case 0:
     ShowBigClock();
-  }
-  else if (page == 1)
-  {
+    break;
+  case 1:
     showAlarmPage();
-  }
-  else if (page == 2)
-  {
+    break;
+  case 2:
     showScalePage();
-  }
-  else if (page == 3)
-  {
+    break;
+  case 3:
     showDatePage();
-  }
-}
-
-void enter()
-{
-  keypressed = myKeypad.getKey();
-  if (keypressed != NO_KEY)
-  {
-    switch (keypressed)
-    {
-    case '1':
-      tone(buzzer, 262, 100);
-      break;
-
-    case '2':
-      tone(buzzer, 293, 100);
-      break;
-
-    case '3':
-      tone(buzzer, 329, 100);
-      break;
-
-    case '4':
-      tone(buzzer, 349, 100);
-      break;
-
-    case '5':
-      tone(buzzer, 392, 100);
-      break;
-
-    case '6':
-      tone(buzzer, 440, 100);
-      break;
-
-    case '7':
-      tone(buzzer, 494, 100);
-      break;
-
-    case '8':
-      tone(buzzer, 523, 100);
-      break;
-
-    case '9':
-      tone(buzzer, 586, 100);
-      break;
-
-    case '0':
-      tone(buzzer, 697, 100);
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      break;
-
-    case 'A':
-      tone(buzzer, 1045, 100);
-      KA = 1;
-      break;
-
-    case 'B':
-      tone(buzzer, 879, 100);
-      KB = 1;
-      break;
-
-    case 'C':
-      tone(buzzer, 987, 100);
-      KC = 1;
-      break;
-
-    case 'D':
-      tone(buzzer, 1971, 100);
-      KD = 1;
-      break;
-
-    case '*':
-      tone(buzzer, 658, 100);
-      KE = 1;
-      break;
-
-    case '#':
-      tone(buzzer, 783, 100);
-      KF = 1;
-      break;
-
-    default:
-      break;
-    }
+    break;
   }
 }

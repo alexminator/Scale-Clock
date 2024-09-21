@@ -1,178 +1,3 @@
-void showAlarmPage(void)
-{
-
-  lcd.clear();
-
-  // fix text
-  lcd.setCursor(3, 0);
-  lcd.print("Alarm Settings");
-
-  while (true)
-  {
-    showAlarmStatus(); // display the status of alarm
-    enter();
-    LDR_Sensor();
-    KB = 0;      // B is invalid before A is pressed
-    KC = 0;      // C is invalid before A is pressed
-    if (KA == 1) // check alarm, move cursor
-    {
-      KA = 0;
-      row_k = 9;
-      col_k = 1;
-      while (true)
-      {
-        enter();
-        if (KA == 1)
-        {
-          KA = 0;
-          col_k += 1;
-          if (col_k > 2)
-          {
-            col_k = 1;
-          }
-        }
-        lcd.setCursor(row_k, col_k);
-        lcd.blink();
-
-        if (KB == 1)
-        {
-          KB = 0;
-          switch (col_k)
-          {
-          case 1:
-            showAlarm1();
-            row_k = 4;
-            col_k = 1;
-            while (true)
-            {
-              enter();
-              if (KA == 1)
-              {
-                KA = 0;
-                row_k += 1;
-                if (row_k > 11)
-                {
-                  row_k = 4;
-                }
-              }
-              lcd.setCursor(row_k, col_k);
-              lcd.blink();
-              if (KB == 1)
-              {
-                KB = 0;
-                BC_flag = false;
-                changeAlarmOne();
-              }
-              if (KC == 1)
-              {
-                KC = 0;
-                BC_flag = true;
-                changeAlarmOne();
-              }
-              if (KF == 1)
-              {
-                KF = 0;
-                reloj.turnOnAlarm(1);
-                // alarm1Flag = true;
-                break;
-              }
-            }
-            row_k = 9;
-            col_k = 1;
-            lcd.clear();
-            showAlarmStatus();
-            break;
-
-          case 2:
-            showAlarm2();
-            row_k = 4;
-            col_k = 1;
-            while (true)
-            {
-              enter();
-              if (KA == 1)
-              {
-                KA = 0;
-                row_k += 1;
-                if (row_k > 8)
-                {
-                  row_k = 4;
-                }
-              }
-              lcd.setCursor(row_k, col_k);
-              lcd.blink();
-              if (KB == 1)
-              {
-                KB = 0;
-                BC_flag = false;
-                changeAlarmTwo();
-              }
-              if (KC == 1)
-              {
-                KC = 0;
-                BC_flag = true;
-                changeAlarmTwo();
-              }
-              if (KF == 1)
-              {
-                KF = 0;
-                reloj.turnOnAlarm(2);
-                // alarm2Flag = true;
-                break;
-              }
-            }
-            row_k = 9;
-            col_k = 1;
-            lcd.clear();
-            showAlarmStatus();
-            break;
-
-          default:
-            break;
-          }
-        }
-        if (KC == 1)
-        {
-          KC = 0;
-          switch (col_k)
-          {
-          case 1:
-            reloj.turnOffAlarm(1);
-            row_k = 9;
-            col_k = 1;
-            // lcd.clear();
-            showAlarmStatus();
-            break;
-
-          case 2:
-            reloj.turnOffAlarm(2);
-            row_k = 9;
-            col_k = 2;
-            // lcd.clear();
-            showAlarmStatus();
-            break;
-
-          default:
-            break;
-          }
-        }
-        if (KF == 1)
-        {
-          KF = 0;
-          break;
-        }
-      }
-      KD = 0; // D is invalid before # is pressed
-    }
-    if (KD == 1)
-    {
-      KD = 0;
-      break;
-    }
-    page = 2;
-  }
-}
-
 void showAlarmStatus()
 {
   // fix text
@@ -521,3 +346,182 @@ void alarm()
     digitalWrite(LED2, HIGH);
   }
 }
+
+
+void showAlarmPage(void)
+{
+
+  lcd.clear();
+
+  // fix text
+  lcd.setCursor(3, 0);
+  lcd.print("Alarm Settings");
+
+  while (true)
+  {
+    showAlarmStatus(); // display the status of alarm
+    enter();
+    LDR_Sensor();
+    KB = 0;      // B is invalid before A is pressed
+    KC = 0;      // C is invalid before A is pressed
+    if (KA == 1) // check alarm, move cursor
+    {
+      KA = 0;
+      row_k = 9;
+      col_k = 1;
+      while (true)
+      {
+        enter();
+        if (KA == 1)
+        {
+          KA = 0;
+          col_k += 1;
+          if (col_k > 2)
+          {
+            col_k = 1;
+          }
+        }
+        lcd.setCursor(row_k, col_k);
+        lcd.blink();
+
+        if (KB == 1)
+        {
+          KB = 0;
+          switch (col_k)
+          {
+          case 1:
+            showAlarm1();
+            row_k = 4;
+            col_k = 1;
+            while (true)
+            {
+              enter();
+              if (KA == 1)
+              {
+                KA = 0;
+                row_k += 1;
+                if (row_k > 11)
+                {
+                  row_k = 4;
+                }
+              }
+              lcd.setCursor(row_k, col_k);
+              lcd.blink();
+              if (KB == 1)
+              {
+                KB = 0;
+                BC_flag = false;
+                changeAlarmOne();
+              }
+              if (KC == 1)
+              {
+                KC = 0;
+                BC_flag = true;
+                changeAlarmOne();
+              }
+              if (KF == 1)
+              {
+                KF = 0;
+                reloj.turnOnAlarm(1);
+                // alarm1Flag = true;
+                break;
+              }
+            }
+            row_k = 9;
+            col_k = 1;
+            lcd.clear();
+            showAlarmStatus();
+            break;
+
+          case 2:
+            showAlarm2();
+            row_k = 4;
+            col_k = 1;
+            while (true)
+            {
+              enter();
+              if (KA == 1)
+              {
+                KA = 0;
+                row_k += 1;
+                if (row_k > 8)
+                {
+                  row_k = 4;
+                }
+              }
+              lcd.setCursor(row_k, col_k);
+              lcd.blink();
+              if (KB == 1)
+              {
+                KB = 0;
+                BC_flag = false;
+                changeAlarmTwo();
+              }
+              if (KC == 1)
+              {
+                KC = 0;
+                BC_flag = true;
+                changeAlarmTwo();
+              }
+              if (KF == 1)
+              {
+                KF = 0;
+                reloj.turnOnAlarm(2);
+                // alarm2Flag = true;
+                break;
+              }
+            }
+            row_k = 9;
+            col_k = 1;
+            lcd.clear();
+            showAlarmStatus();
+            break;
+
+          default:
+            break;
+          }
+        }
+        if (KC == 1)
+        {
+          KC = 0;
+          switch (col_k)
+          {
+          case 1:
+            reloj.turnOffAlarm(1);
+            row_k = 9;
+            col_k = 1;
+            // lcd.clear();
+            showAlarmStatus();
+            break;
+
+          case 2:
+            reloj.turnOffAlarm(2);
+            row_k = 9;
+            col_k = 2;
+            // lcd.clear();
+            showAlarmStatus();
+            break;
+
+          default:
+            break;
+          }
+        }
+        if (KF == 1)
+        {
+          KF = 0;
+          break;
+        }
+      }
+      KD = 0; // D is invalid before # is pressed
+    }
+    if (KD == 1)
+    {
+      KD = 0;
+      break;
+    }
+    page = 2;
+  }
+}
+
+
+
