@@ -12,15 +12,15 @@
                  +------------| USB |------------+
                  |            +-----+            |
     DOUT HX711   | [X]D13/SCK        MISO/D12[X] |   CLK HX711
-                 | [X]3.3V           MOSI/D11[ ]~|
-                 | [X]V.ref     ___    SS/D10[X]~|   BACKLIGHT
+                 | [ ]3.3V           MOSI/D11[ ]~|
+                 | [ ]V.ref     ___    SS/D10[X]~|   BACKLIGHT
     BUZZER       | [X]A0       / N \       D9[X]~|   KEYPAD
     LED 1        | [X]A1      /  A  \      D8[X] |   KEYPAD
     LED 2        | [X]A2      \  N  /      D7[X] |   KEYPAD
     LDR          | [X]A3       \_0_/       D6[X]~|   KEYPAD
     I2C          | [X]A4/SDA               D5[X]~|   KEYPAD
     I2C          | [X]A5/SCL               D4[X] |   KEYPAD
-    BATT READ    | [X]A6              INT1/D3[X]~|   KEYPAD
+                 | [ ]A6              INT1/D3[X]~|   KEYPAD
     POWER DETECT | [X]A7              INT0/D2[X] |   KEYPAD
                  | [X]5V                  GND[X] |
                  | [ ]RST                 RST[ ] |
