@@ -73,7 +73,10 @@ bool scale_flag = false;                    // false is pricing scale,true is co
 // Brightness LCD control using LDR
 #define LDR_PIN A3
 #define BACKLIGHT_PIN 10 // PWM Pin
-byte ldr, bri, bled; // LCD Bright 
+int ldr;  
+byte bri, bled; // LCD Bright
+int filteredLDR = 0;  // Initialize filtered value
+float alpha = 0.1;  // Filter coefficient (0 < alpha < 1)
 
 // Buzzer Pin
 #define BUZZER A0
@@ -131,7 +134,7 @@ float powervcc;
 // Power detect
 #define POWERPIN A7
 float powersensor;
-byte sensorVCC;
+int sensorVCC, filteredVCC;
 byte blackoutTimeH, blackoutTimeDate, blackoutTimeM, poweronTimeH, poweronTimeM, poweronTimeDate;
 String blackoutTimeMonth, poweronTimeMonth, blackoutAMPM, poweronAMPM, formattedHourBlackout, formattedMinuteBlackout, formattedHourPoweron, formattedMinutePoweron;
 bool powerflag; // True, there's 5v power from supply. False a blackout event happens
@@ -184,6 +187,8 @@ void setup()
   // Initialize pins
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
+  pinMode(LDR_PIN, INPUT);
+  pinMode(BACKLIGHT_PIN, OUTPUT);
 
   lcd.init();      // initialize LCD
   lcd.backlight(); // set the backlight of LCD on

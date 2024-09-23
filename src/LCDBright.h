@@ -1,8 +1,10 @@
 void LDR_Sensor()
 {
     ldr = analogRead(LDR_PIN);
-    bri = map(ldr, 0, 1023, 0, 255);
-    
+    filteredLDR = alpha * ldr + (1 - alpha) * filteredLDR;  // Filter equation
+    //Serial.println(filteredLDR);
+    bri = map(filteredLDR, 0, 1023, 0, 255);
+    //Serial.println(bri);
     switch (bled)
     {
     case 1:

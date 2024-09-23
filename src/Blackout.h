@@ -2,7 +2,8 @@ void acdetect()
 {
   float Vref = VccVoltageReader();
   sensorVCC = analogRead(POWERPIN);
-  powersensor = ((float)sensorVCC / 1024) * Vref;
+  powersensor = ((float)sensorVCC * Vref) / 1024;
+  //Serial.println(powersensor);
   powerflag = (powersensor > 0.1); //It will be true if it is greater than 0.1 if it is 0 it will be false
 }
 

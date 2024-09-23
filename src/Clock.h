@@ -217,22 +217,6 @@ void OtherInfo()
     LDR_Sensor();
     enter();
     VccVoltageReader();
-    // Display the temperature
-    /*
-    temp = reloj.getTemperature();
-    convertemp = temp * 100;
-    t1 = (convertemp / 1000) % 10;
-    t2 = (convertemp / 100) % 10;
-    t3 = (convertemp / 10) % 10;
-    // t4 = (convertemp/1) %10;
-
-    // Print temperature
-    lcd.setCursor(0, 3);
-    lcd.print("Temp ");
-    lcd.print(temp);
-    lcd.print(char(223)); // Degree ASCII
-    lcd.print(char(67));  // C capital ASCII
-    */
 
     // Battery
     lcd.setCursor(0, 2);
