@@ -1,5 +1,8 @@
 void LDR_Sensor()
 {
+    ldr = analogRead(LDR_PIN);
+    bri = map(ldr, 0, 1023, 0, 255);
+    
     switch (bled)
     {
     case 1:
@@ -18,9 +21,6 @@ void LDR_Sensor()
         analogWrite(BACKLIGHT_PIN, 255);
         break;
     case 6:
-        ldr = analogRead(LDR_PIN);
-        bri = map(ldr, 0, 1023, 0, 255);
-        Serial.println(bri);
         analogWrite(BACKLIGHT_PIN, bri);
         break;
     default:

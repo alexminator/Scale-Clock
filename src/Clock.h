@@ -353,7 +353,7 @@ void ShowBigClock()
   while (true)
   {
     alarm(); // detect alarm
-    //LDR_Sensor();
+    LDR_Sensor();
     BigClock();
     enter();
 

@@ -71,13 +71,9 @@ bool scale_flag = false;                    // false is pricing scale,true is co
 #define LED2 A2
 
 // Brightness LCD control using LDR
-//#define LDR_PIN A3
-//#define BACKLIGHT_PIN 10 // PWM Pin
-//byte ldr, bri, bled; // LCD Bright 
-const int LDR_PIN = A3;
-const int BACKLIGHT_PIN = 10; // PWM Pin
-int ldr, bri;
-int bled; // LCD Bright AUTO mode
+#define LDR_PIN A3
+#define BACKLIGHT_PIN 10 // PWM Pin
+byte ldr, bri, bled; // LCD Bright 
 
 // Buzzer Pin
 #define BUZZER A0
@@ -188,8 +184,6 @@ void setup()
   // Initialize pins
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
-  pinMode(LDR_PIN, INPUT_PULLUP);
-  pinMode(BACKLIGHT_PIN, OUTPUT);
 
   lcd.init();      // initialize LCD
   lcd.backlight(); // set the backlight of LCD on
