@@ -1,10 +1,3 @@
-/*
-void format(){
-  formattedHour = (hour < 10) ? "0" + String(hour) : String(hour);
-  formattedMinute = (minute < 10) ? "0" + String(minute) : String(minute);
-}
-*/
-
 void HourFormat12()
 {
   hour = reloj.getHour(h12Flag, pmFlag);
@@ -137,7 +130,7 @@ void BigClock()
   // O'clock sound
   if (minute == 0 && page == 0 && second == 0)
   {
-    tone(buzzer, 783, 100);
+    tone(BUZZER, 783, 100);
     delay(60);
     digitalWrite(LED2, HIGH);
     delay(60);
@@ -225,6 +218,7 @@ void OtherInfo()
     enter();
     VccVoltageReader();
     // Display the temperature
+    /*
     temp = reloj.getTemperature();
     convertemp = temp * 100;
     t1 = (convertemp / 1000) % 10;
@@ -238,6 +232,7 @@ void OtherInfo()
     lcd.print(temp);
     lcd.print(char(223)); // Degree ASCII
     lcd.print(char(67));  // C capital ASCII
+    */
 
     // Battery
     lcd.setCursor(0, 2);
@@ -257,12 +252,14 @@ void OtherInfo()
     EEPROM.get(70, blackoutTimeMonth);
     lcd.setCursor(0, 0);
     lcd.print("OFF:");
+    formattedHourBlackout = (blackoutTimeH < 10) ? "0" + String(blackoutTimeH) : String(blackoutTimeH);
     lcd.setCursor(5, 0);
-    lcd.print(blackoutTimeH);
+    lcd.print(formattedHourBlackout);
     lcd.setCursor(7, 0);
     lcd.print(":");
+    formattedMinuteBlackout = (blackoutTimeM < 10) ? "0" + String(blackoutTimeM) : String(blackoutTimeM);
     lcd.setCursor(8, 0);
-    lcd.print(blackoutTimeM);
+    lcd.print(formattedMinuteBlackout);
     lcd.setCursor(11, 0);
     lcd.print(blackoutAMPM);
     lcd.setCursor(14, 0);
@@ -279,12 +276,14 @@ void OtherInfo()
     EEPROM.get(120, poweronTimeMonth);
     lcd.setCursor(0, 1);
     lcd.print("ON :");
+    formattedHourPoweron = (poweronTimeH < 10) ? "0" + String(poweronTimeH) : String(poweronTimeH);
     lcd.setCursor(5, 1);
-    lcd.print(poweronTimeH);
+    lcd.print(formattedHourPoweron);
     lcd.setCursor(7, 1);
     lcd.print(":");
+    formattedMinutePoweron = (poweronTimeM < 10) ? "0" + String(poweronTimeM) : String(poweronTimeM);
     lcd.setCursor(8, 1);
-    lcd.print(poweronTimeM);
+    lcd.print(formattedMinutePoweron);
     lcd.setCursor(11, 1);
     lcd.print(poweronAMPM);
     lcd.setCursor(14, 1);
@@ -354,7 +353,7 @@ void ShowBigClock()
   while (true)
   {
     alarm(); // detect alarm
-    LDR_Sensor();
+    //LDR_Sensor();
     BigClock();
     enter();
 

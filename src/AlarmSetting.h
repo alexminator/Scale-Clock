@@ -336,13 +336,13 @@ void alarm()
   // Indicate whether an alarm went off
   if (reloj.checkAlarmEnabled(1) && reloj.checkIfAlarm(1))
   { // clock 1 detects alarm
-    tone(buzzer, 2000);
+    tone(BUZZER, 2000);
     digitalWrite(LED1, HIGH);
   }
 
   if (reloj.checkAlarmEnabled(2) && reloj.checkIfAlarm(2))
   { // clock 2 detects alarm
-    tone(buzzer, 1000);
+    tone(BUZZER, 1000);
     digitalWrite(LED2, HIGH);
   }
 }
@@ -522,6 +522,3 @@ void showAlarmPage(void)
     page = 2;
   }
 }
-
-
-

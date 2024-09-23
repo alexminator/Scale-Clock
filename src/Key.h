@@ -10,7 +10,7 @@ void enter()
 
     if (keyIndex >= 0 && keyIndex <= 9)
     {
-      tone(buzzer, tones[keyIndex], 100);
+      tone(BUZZER, tones[keyIndex], 100);
       if (keyIndex == 0)
       {
         digitalWrite(LED1, LOW);
@@ -19,7 +19,7 @@ void enter()
     }
     else if (keypressed >= 'A' && keypressed <= 'D')
     {
-      tone(buzzer, tones[keypressed - 'A' + 10], 100);
+      tone(BUZZER, tones[keypressed - 'A' + 10], 100);
       switch (keypressed)
       {
       case 'A':
@@ -38,12 +38,12 @@ void enter()
     }
     else if (keypressed == '*')
     {
-      tone(buzzer, tones[14], 100); 
+      tone(BUZZER, tones[14], 100); 
       KE = 1;                       
     }
     else if (keypressed == '#')
     {
-      tone(buzzer, tones[15], 100); 
+      tone(BUZZER, tones[15], 100); 
       KF = 1;                       
     }
   }

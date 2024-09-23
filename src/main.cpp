@@ -67,17 +67,20 @@ int known_weight[4] = {50, 100, 500, 1000}; // Change with knowning weight
 bool scale_flag = false;                    // false is pricing scale,true is counting scale
 
 // The two LEDs are connected to A1 and A2. Turning analog pin into digital pin
-const int LED1 = A1;
-const int LED2 = A2;
+#define LED1 A1
+#define LED2 A2
 
 // Brightness LCD control using LDR
+//#define LDR_PIN A3
+//#define BACKLIGHT_PIN 10 // PWM Pin
+//byte ldr, bri, bled; // LCD Bright 
 const int LDR_PIN = A3;
 const int BACKLIGHT_PIN = 10; // PWM Pin
 int ldr, bri;
 int bled; // LCD Bright AUTO mode
 
 // Buzzer Pin
-const int buzzer = A0;
+#define BUZZER A0
 
 // KeyPad Variables
 const byte ROWS = 4; // four rows
@@ -126,15 +129,15 @@ unsigned long now = 0;
 unsigned long startCollecting = 0; // Aux variable for Clock information
 
 // Battery
-#define BATTERYPIN A6
+#define FREEADCPIN A6 // An analog pin that is not being used
 float powervcc;
 
 // Power detect
 #define POWERPIN A7
 float powersensor;
-int sensorVCC;
+byte sensorVCC;
 byte blackoutTimeH, blackoutTimeDate, blackoutTimeM, poweronTimeH, poweronTimeM, poweronTimeDate;
-String blackoutTimeMonth, poweronTimeMonth, blackoutAMPM, poweronAMPM;
+String blackoutTimeMonth, poweronTimeMonth, blackoutAMPM, poweronAMPM, formattedHourBlackout, formattedMinuteBlackout, formattedHourPoweron, formattedMinutePoweron;
 bool powerflag; // True, there's 5v power from supply. False a blackout event happens
 bool blackoutTriggered = false; // Flag to control the activation of datablackout
 bool powerOnTriggered = false;   // Flag to control the activation of poweron
@@ -163,7 +166,7 @@ void setup()
 
   // That request is not honoured until we read the analog pin
   // so force voltage reference to be turned on
-  analogRead(BATTERYPIN);
+  analogRead(FREEADCPIN);
 
   // Get value from EEPROM
   EEPROM.get(0, ratio);              // Get scale ratio.int value 2 bytes
@@ -181,10 +184,6 @@ void setup()
   EEPROM.get(100, poweronTimeDate);  // Get date power on event.
   EEPROM.get(110, poweronAMPM);      // Get AM/PM poweron event. 
   EEPROM.get(120, poweronTimeMonth); // Get month power on  event.
-
-
-  Serial.println(blackoutAMPM);
-  Serial.println(poweronAMPM);
 
   // Initialize pins
   pinMode(LED1, OUTPUT);
@@ -205,7 +204,7 @@ void setup()
   hx.tare();
 
   // intro
-  tone(buzzer, 1971, 100);
+  tone(BUZZER, 1971, 100);
   delay(60);
 
   lcd.createChar(1, progress1);
@@ -232,7 +231,7 @@ void setup()
     delay(90);
   }
 
-  tone(buzzer, 494, 100);
+  tone(BUZZER, 494, 100);
   delay(60);
   // intro end
 
