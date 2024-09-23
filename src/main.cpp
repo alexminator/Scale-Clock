@@ -134,7 +134,7 @@ float powervcc;
 float powersensor;
 int sensorVCC;
 byte blackoutTimeH, blackoutTimeDate, blackoutTimeM, poweronTimeH, poweronTimeM, poweronTimeDate;
-String blackoutTimeMonth, poweronTimeMonth;
+String blackoutTimeMonth, poweronTimeMonth, blackoutAMPM, poweronAMPM;
 bool powerflag; // True, there's 5v power from supply. False a blackout event happens
 bool blackoutTriggered = false; // Flag to control the activation of datablackout
 bool powerOnTriggered = false;   // Flag to control the activation of poweron
@@ -173,12 +173,18 @@ void setup()
   EEPROM.get(30, blackoutTimeH);     // Get hour blackout event. int value 2 bytes
   EEPROM.get(40, blackoutTimeM);     // Get minute blackout event. int value 2 bytes
   EEPROM.get(50, blackoutTimeDate);  // Get date blackout event.
+  EEPROM.get(60, blackoutAMPM);      // Get AM/PM blackout event. 
   EEPROM.get(70, blackoutTimeMonth); // Get month blackout event.
   // Power its back
   EEPROM.get(80, poweronTimeH);     // Get hour power on event. int value 2 bytes
   EEPROM.get(90, poweronTimeM);     // Get minute power on event. int value 2 bytes
   EEPROM.get(100, poweronTimeDate);  // Get date power on event.
+  EEPROM.get(110, poweronAMPM);      // Get AM/PM poweron event. 
   EEPROM.get(120, poweronTimeMonth); // Get month power on  event.
+
+
+  Serial.println(blackoutAMPM);
+  Serial.println(poweronAMPM);
 
   // Initialize pins
   pinMode(LED1, OUTPUT);

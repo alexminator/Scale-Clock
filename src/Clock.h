@@ -1,24 +1,25 @@
+/*
+void format(){
+  formattedHour = (hour < 10) ? "0" + String(hour) : String(hour);
+  formattedMinute = (minute < 10) ? "0" + String(minute) : String(minute);
+}
+*/
 
 void HourFormat12()
 {
   hour = reloj.getHour(h12Flag, pmFlag);
-
   if (hour == 0)
   {
     hour = 12;     // 12 Midnight
     pmFlag = true; // Set AM
   }
-  else if (hour >= 1 && hour < 12)
+  else if (hour < 12)
   {
     pmFlag = true; // Set AM
   }
-  else if (hour > 12)
-  {
-    hour = hour - 12;
-    pmFlag = false; // Set PM
-  }
   else
   {
+    hour -= 12;     // Convert to 12-hour format
     pmFlag = false; // Set PM
   }
 }
@@ -237,7 +238,6 @@ void OtherInfo()
     lcd.print(temp);
     lcd.print(char(223)); // Degree ASCII
     lcd.print(char(67));  // C capital ASCII
-    
 
     // Battery
     lcd.setCursor(0, 2);
@@ -246,23 +246,15 @@ void OtherInfo()
     lcd.print(powervcc);
     lcd.setCursor(9, 2);
     lcd.print("V");
-        if (!powerflag)
-    {
-      lcd.setCursor(11, 2);
-      lcd.print("Using BAT");
-    }
-    else
-    {
-      lcd.setCursor(11, 2);
-      lcd.print("Charging");
-    }
-
+    lcd.setCursor(11, 2);
+    lcd.print(!powerflag ? "Using BAT" : "Charging");
 
     // Blackout data
-    blackoutTimeH = EEPROM.get(30, blackoutTimeH);
-    blackoutTimeM = EEPROM.get(40, blackoutTimeM);
-    blackoutTimeDate = EEPROM.get(50, blackoutTimeDate);
-    blackoutTimeMonth = EEPROM.get(70, blackoutTimeMonth);
+    EEPROM.get(30, blackoutTimeH);
+    EEPROM.get(40, blackoutTimeM);
+    EEPROM.get(50, blackoutTimeDate);
+    EEPROM.get(60, blackoutAMPM);
+    EEPROM.get(70, blackoutTimeMonth);
     lcd.setCursor(0, 0);
     lcd.print("OFF:");
     lcd.setCursor(5, 0);
@@ -271,16 +263,8 @@ void OtherInfo()
     lcd.print(":");
     lcd.setCursor(8, 0);
     lcd.print(blackoutTimeM);
-    if (!pmFlag)
-    {
-      lcd.setCursor(10, 0);
-      lcd.print(" PM");
-    }
-    else
-    {
-      lcd.setCursor(10, 0);
-      lcd.print(" AM");
-    }
+    lcd.setCursor(11, 0);
+    lcd.print(blackoutAMPM);
     lcd.setCursor(14, 0);
     lcd.print(blackoutTimeDate);
     lcd.setCursor(16, 0);
@@ -288,10 +272,11 @@ void OtherInfo()
     lcd.setCursor(17, 0);
     lcd.print(blackoutTimeMonth);
     // Power on data
-    poweronTimeH = EEPROM.get(80, poweronTimeH);
-    poweronTimeM = EEPROM.get(90, poweronTimeM);
-    poweronTimeDate = EEPROM.get(100, poweronTimeDate);
-    poweronTimeMonth = EEPROM.get(120, poweronTimeMonth);
+    EEPROM.get(80, poweronTimeH);
+    EEPROM.get(90, poweronTimeM);
+    EEPROM.get(100, poweronTimeDate);
+    EEPROM.get(110, poweronAMPM);
+    EEPROM.get(120, poweronTimeMonth);
     lcd.setCursor(0, 1);
     lcd.print("ON :");
     lcd.setCursor(5, 1);
@@ -300,16 +285,8 @@ void OtherInfo()
     lcd.print(":");
     lcd.setCursor(8, 1);
     lcd.print(poweronTimeM);
-    if (!pmFlag)
-    {
-      lcd.setCursor(10, 1);
-      lcd.print(" PM");
-    }
-    else
-    {
-      lcd.setCursor(10, 1);
-      lcd.print(" AM");
-    }
+    lcd.setCursor(11, 1);
+    lcd.print(poweronAMPM);
     lcd.setCursor(14, 1);
     lcd.print(poweronTimeDate);
     lcd.setCursor(16, 1);
@@ -357,21 +334,10 @@ void ShowDateInfo()
   lcd.setCursor(7, 0);
   lcd.print(monthName); // Minus one, arrays begins in 0
 
-  if (h12Flag)
-  {
-    if (!pmFlag)
-    {
-      lcd.setCursor(11, 0);
-      lcd.print("PM");
-    }
-    else
-    {
-      lcd.setCursor(11, 0);
-      lcd.print("AM");
-    }
-  }
-  else
-  {
+  if (h12Flag) {
+    lcd.setCursor(11, 0);
+    lcd.print(!pmFlag ? "PM" : "AM");
+  } else {
     // dash
     lcd.setCursor(10, 0);
     lcd.print("-");
@@ -391,6 +357,7 @@ void ShowBigClock()
     LDR_Sensor();
     BigClock();
     enter();
+
     currentMillis = millis();
     // Check if the update time has passed
     if (currentMillis - startMillis >= refresh)
@@ -400,16 +367,19 @@ void ShowBigClock()
       // Only calls datablackout if powerflag is false and has not been called before
       if (!powerflag && !blackoutTriggered)
       {
+        blackoutAMPM = !pmFlag ? "PM" : "AM"; // Set blackoutAMPM based on pmFlag
         datablackout();
         blackoutTriggered = true; // Marks that datablackout has been activated
         powerOnTriggered = false; // Reset the poweron flag
+        // Serial.println("Blackout event at: " + String(hour) + ":" + String(minute) + " " + poweronAMPM);
       }
       else if (powerflag && !powerOnTriggered)
       {
+        poweronAMPM = !pmFlag ? "PM" : "AM"; // Set poweronAMPM based on pmFlag
         datapoweron();
         powerOnTriggered = true;   // Marks that datapoweron has been activated
         blackoutTriggered = false; // Reset the blackout flag
-        Serial.println("Power 5V");
+        // Serial.println("Power on event at: " + String(hour) + ":" + String(minute) + " " + poweronAMPM);
       }
     }
 
@@ -422,7 +392,7 @@ void ShowBigClock()
       ShowDateInfo();
     }
 
-    if (KE == 1) // Show other info sub screen. Temp & voltage of batt
+    if (KE == 1) // Show other info sub screen. Temp & power events
     {
       KE = 0;
       OtherInfo();
@@ -436,7 +406,7 @@ void ShowBigClock()
       digitalWrite(LED2, LOW);
       break;
     }
-    if (KB == 1) // Show hour in 12H mode
+        if (KB == 1) // Show hour in 12H mode
     {
       KB = 0;
       HourFormat12(); // Convert to 12H, only for show on bigclock
