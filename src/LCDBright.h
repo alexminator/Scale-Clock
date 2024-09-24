@@ -5,6 +5,8 @@ void LDR_Sensor()
     //Serial.println(filteredLDR);
     bri = map(filteredLDR, 0, 1023, 0, 255);
     //Serial.println(bri);
+    bri = (bri < 30) ? 50 : bri;
+    
     switch (bled)
     {
     case 1:

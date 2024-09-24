@@ -1,21 +1,27 @@
 void HourFormat12()
 {
   hour = reloj.getHour(h12Flag, pmFlag);
+
   if (hour == 0)
   {
     hour = 12;     // 12 Midnight
     pmFlag = true; // Set AM
   }
-  else if (hour < 12)
+  else if (hour >= 1 && hour < 12)
   {
     pmFlag = true; // Set AM
   }
+  else if (hour > 12)
+  {
+    hour = hour - 12;
+    pmFlag = false; // Set PM
+  }
   else
   {
-    hour -= 12;     // Convert to 12-hour format
     pmFlag = false; // Set PM
   }
 }
+
 
 void ShowInfo()
 {
