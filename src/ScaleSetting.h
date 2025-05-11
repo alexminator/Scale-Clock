@@ -1,141 +1,91 @@
-void showScaleOne()
-{
-  // Fix text
-  lcd.setCursor(6, 0);
-  lcd.print("BALANZA");
-  lcd.setCursor(0, 1);
-  lcd.print("GR:");
-  lcd.setCursor(0, 2);
-  lcd.print("KG:");
-  lcd.setCursor(11, 1);
-  lcd.print("LB:");
-  lcd.setCursor(11, 2);
-  lcd.print("OZ:");
+void showScaleOne() {
+  // Constantes de conversión
+  const float GRAM_TO_KG = 1.0 / 1000.0;
+  const float GRAM_TO_LB = 1.0 / 453.59237;
+  const float GRAM_TO_OZ = 1.0 / 28.3495231;
 
-  // Read on gr
+  // Etiquetas
+  lcd.setCursor(6, 0); lcd.print("BALANZA");
+  lcd.setCursor(0, 1); lcd.print("GR:");
+  lcd.setCursor(0, 2); lcd.print("KG:");
+  lcd.setCursor(11, 1); lcd.print("LB:");
+  lcd.setCursor(11, 2); lcd.print("OZ:");
+
+  // Lectura de peso en gramos
   weight = hx.get_units(30);
-  hx.power_down(); // put the ADC in sleep mode
-  delay(1);
-  hx.power_up();
+  hx.power_down(); delay(1); hx.power_up();
 
-  /*while (weight>100000) {
-    lcd.setCursor(0,0);
-    lcd.print("     WARNING !!!    ");
-    lcd.setCursor(0,1);
-    lcd.print("                    ");
-    lcd.setCursor(0,2);
-    lcd.print("  Scale Overloaded  ");
-    lcd.setCursor(0,3);
-    lcd.print("                    ");
-    tone(buzzer, 783, 100);
-    delay(100);
-    tone(buzzer, 658, 100);
-    delay(100);
-    lcd.clear();
-    weight = hx.get_units(30);
-  }
-  */
+  // Conversiones
+  weight_kg = weight * GRAM_TO_KG;
+  weight_lb = weight * GRAM_TO_LB;
+  weight_oz = weight * GRAM_TO_OZ;
 
-  // kilograms
-  weight_kg = weight / 1000.0;
-  char buff1[6];
-  dtostrf(weight_kg, 6, 3, buff1);
-  lcd.setCursor(3, 2);
-  lcd.print(buff1);
-  // Grams
-  char buff2[6];
-  dtostrf(weight, 6, 1, buff2);
-  lcd.setCursor(3, 1);
-  lcd.print(buff2);
-  // Pounds
-  weight_lb = weight * 0.002205;
-  char buff3[6];
-  dtostrf(weight_lb, 6, 1, buff3);
-  lcd.setCursor(14, 1);
-  lcd.print(buff3);
-  // ounce
-  weight_oz = weight * 0.035273;
-  char buff4[6];
-  dtostrf(weight_oz, 6, 1, buff4);
-  lcd.setCursor(14, 2);
-  lcd.print(buff4);
+  // Mostrar valores
+  char buff[10];
+  dtostrf(weight, 6, 1, buff); lcd.setCursor(3, 1); lcd.print(buff);      // Gramos
+  dtostrf(weight_kg, 6, 3, buff); lcd.setCursor(3, 2); lcd.print(buff);   // Kilogramos
+  dtostrf(weight_lb, 6, 2, buff); lcd.setCursor(14, 1); lcd.print(buff);  // Libras
+  dtostrf(weight_oz, 6, 2, buff); lcd.setCursor(14, 2); lcd.print(buff);  // Onzas
 
-  lcd.setCursor(0, 3);
-  lcd.print("P=");
-  lcd.setCursor(5, 3);
-  lcd.print(".");
+  // Show Price
+  lcd.setCursor(0, 3); lcd.print("P=");
+  lcd.setCursor(5, 3); lcd.print(".");
 
-  P1 = int(P * 10) / 1000;
-  P2 = (int(P * 10) - P1 * 1000) / 100;
-  P3 = (int(P * 10) - P1 * 1000 - P2 * 100) / 10;
-  P4 = int(P * 10) % 10;
-  lcd.setCursor(2, 3);
-  lcd.print(P1);
-  lcd.setCursor(3, 3);
-  lcd.print(P2);
-  lcd.setCursor(4, 3);
-  lcd.print(P3);
-  lcd.setCursor(6, 3);
-  lcd.print(P4);
+  int p_int = int(P * 10 + 0.5); // Redondeo correcto
+  P1 = (p_int / 1000) % 10;
+  P2 = (p_int / 100) % 10;
+  P3 = (p_int / 10) % 10;
+  P4 = p_int % 10;
 
-  lcd.setCursor(10, 3);
-  lcd.print("M=");
-  M = weight_lb * P;
-  char buff5[6];
-  dtostrf(M, -6, 1, buff5); // right alignment
-  if (M >= 0)
+  lcd.setCursor(2, 3); lcd.print(P1);
+  lcd.setCursor(3, 3); lcd.print(P2);
+  lcd.setCursor(4, 3); lcd.print(P3);
+  lcd.setCursor(6, 3); lcd.print(P4);
+
+  // Show Total
+  lcd.setCursor(10, 3); lcd.print("T=");
+  T = weight_lb * P;
+  if (T >= 0)
   {
-    lcd.setCursor(12, 3);
-    lcd.print(buff5);
+    dtostrf(T, 6, 1, buff);
+    lcd.setCursor(12, 3); lcd.print(buff);
   }
   else
   {
-    lcd.setCursor(12, 3);
-    lcd.print("----.-");
+    lcd.setCursor(12, 3); lcd.print("----.-");
   }
 }
 
-void changeScaleOne()
-{
-  if (keypressed == '0' || keypressed == '1' || keypressed == '2' || keypressed == '3' ||
-      keypressed == '4' || keypressed == '5' || keypressed == '6' || keypressed == '7' ||
-      keypressed == '8' || keypressed == '9')
+void changeScaleOne() {
+  if (keypressed >= '0' && keypressed <= '9')
   {
-    key_num = keypressed - '0';
+    int key_num = keypressed - '0';
+    int p_int = int(P * 10 + 0.5);
+
     switch (row_k)
     {
-    case 2:
-      lcd.setCursor(row_k, col_k);
-      lcd.print(keypressed);
-      P = P - P1 * 100 + key_num * 100;
-      break;
-
-    case 3:
-      lcd.setCursor(row_k, col_k);
-      lcd.print(keypressed);
-      P = P - P2 * 10 + key_num * 10;
-      break;
-
-    case 4:
-      lcd.setCursor(row_k, col_k);
-      lcd.print(keypressed);
-      P = P - P3 + key_num;
-      break;
-
-    case 6:
-      lcd.setCursor(row_k, col_k);
-      lcd.print(keypressed);
-      P = P - float(P4) / 10 + key_num / 10;
-      break;
-
-    default:
-      break;
+      case 2: // Centena
+        p_int = (key_num * 1000) + (p_int % 1000);
+        break;
+      case 3: // Decena
+        p_int = ((p_int / 1000) * 1000) + (key_num * 100) + (p_int % 100);
+        break;
+      case 4: // Unidad
+        p_int = ((p_int / 100) * 100) + (key_num * 10) + (p_int % 10);
+        break;
+      case 6: // Decimal
+        p_int = (p_int / 10) * 10 + key_num;
+        break;
+      default:
+        break;
     }
+    P = p_int / 10.0;
+    lcd.setCursor(row_k, col_k);
+    lcd.print(keypressed);
   }
 }
 
-void calibrate()
-{
+void calibrate() {
   lcd.init(); // initialize LCD, avoid cursor flashing
   int i = 0, cal = 1;
   long adc_lecture;
@@ -198,8 +148,7 @@ void calibrate()
   }
 }
 
-void showScalePage()
-{
+void showScalePage() {
   hx.tare();
 
   while (page == 2)
@@ -263,5 +212,3 @@ void showScalePage()
     }
   }
 }
-
-

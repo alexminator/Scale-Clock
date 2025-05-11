@@ -2,31 +2,20 @@ void HourFormat12()
 {
   hour = reloj.getHour(h12Flag, pmFlag);
 
-  if (hour == 0)
-  {
+  if (hour == 0) {
     hour = 12;     // 12 Midnight
-    pmFlag = true; // Set AM
-  }
-  else if (hour >= 1 && hour < 12)
-  {
-    pmFlag = true; // Set AM
-  }
-  else if (hour > 12)
-  {
-    hour = hour - 12;
-    pmFlag = false; // Set PM
-  }
-  else
-  {
-    pmFlag = false; // Set PM
+    pmFlag = true; // AM
+  } else if (hour < 12) {
+    pmFlag = true; // AM
+  } else {
+    if (hour > 12) hour -= 12;
+    pmFlag = false; // PM
   }
 }
 
-
 void ShowInfo()
 {
-  if (!isClockInfoShown)
-  {
+  if (!isClockInfoShown) {
     startCollecting = millis();
     isClockInfoShown = true;
   }
@@ -34,49 +23,27 @@ void ShowInfo()
   lcd.print("             "); // Clean info
 
   // Display the temperature
-  if (reloj.getTemperature() < 10)
-  {
-    lcd.setCursor(0, 0);
-    lcd.print(" ");
-    lcd.setCursor(0, 0);
-    lcd.print(reloj.getTemperature(), 1);
-  }
-  else
-  {
-    lcd.setCursor(0, 0);
-    lcd.print(reloj.getTemperature(), 1);
-  }
+  float tempVal = reloj.getTemperature();
+  lcd.setCursor(0, 0);
+  if (tempVal < 10) lcd.print(" ");
+  lcd.print(tempVal, 1);
   lcd.setCursor(4, 0);
-  lcd.print(char(223)); // Degree ASCII
-  lcd.print(char(67));  // C capital ASCII
+  lcd.write(223); // Degree ASCII
+  lcd.print("C");
 
-  //  Show alarm status.
-  lcd.setCursor(8, 0);
-  lcd.print("A1");
-  lcd.setCursor(11, 0);
-  lcd.print("A2");
-
-  if (reloj.checkAlarmEnabled(1))
-  {
-    lcd.setCursor(7, 0);
-    lcd.print(char(126));
-  }
-  if (reloj.checkAlarmEnabled(2))
-  {
-    lcd.setCursor(10, 0);
-    lcd.print(char(126));
-  }
+  // Show alarm status
+  lcd.setCursor(8, 0); lcd.print("A1");
+  lcd.setCursor(11, 0); lcd.print("A2");
+  if (reloj.checkAlarmEnabled(1)) { lcd.setCursor(7, 0); lcd.write(126); }
+  if (reloj.checkAlarmEnabled(2)) { lcd.setCursor(10, 0); lcd.write(126); }
 }
 
 void BigClock()
 {
   // hour, minute, and second
-  if (!h12Flag)
-  {
+  if (!h12Flag) {
     hour = reloj.getHour(h12Flag, pmFlag);
-  }
-  else
-  {
+  } else {
     HourFormat12(); // Convert to 12H, only for show on bigclock
     h12Flag = true;
   }
@@ -94,48 +61,18 @@ void BigClock()
   month = reloj.getMonth(century);
   monthName = M_arr[month - 1];
 
-  // Change info every mode time. Mode = 2 to 5 mints
-
-  if (mode == 2)
-  {
-    IntervalInfo = 120000;
-    if (millis() >= now + IntervalInfo)
-    {
-      now = millis();
-      ShowInfo();
-    }
-  }
-  else if (mode == 3)
-  {
-    IntervalInfo = 180000;
-    if (millis() >= now + IntervalInfo)
-    {
-      now = millis();
-      ShowInfo();
-    }
-  }
-  else if (mode == 4)
-  {
-    IntervalInfo = 240000;
-    if (millis() >= now + IntervalInfo)
-    {
-      now = millis();
-      ShowInfo();
-    }
-  }
-  else if (mode == 5)
-  {
-    IntervalInfo = 300000;
-    if (millis() >= now + IntervalInfo)
-    {
+  // Mostrar info cada cierto tiempo según modo
+  static const unsigned long intervalos[] = {0, 0, 120000, 180000, 240000, 300000};
+  if (mode >= 2 && mode <= 5) {
+    IntervalInfo = intervalos[mode];
+    if (millis() >= now + IntervalInfo) {
       now = millis();
       ShowInfo();
     }
   }
 
   // O'clock sound
-  if (minute == 0 && page == 0 && second == 0)
-  {
+  if (minute == 0 && page == 0 && second == 0) {
     tone(BUZZER, 783, 100);
     delay(60);
     digitalWrite(LED2, HIGH);
@@ -144,8 +81,7 @@ void BigClock()
   }
 
   // Print LCD
-  if (second != osec)
-  {
+  if (second != osec) {
     printNum3(h1, 0, 1);
     printNum3(h2, 3, 1);
     printColon(6, 1);
@@ -161,57 +97,21 @@ void BigClock()
 
 bool shouldShowInfo()
 {
-  if (millis() - startCollecting >= 60000)
-  {
+  if (millis() - startCollecting >= 60000) {
     isClockInfoShown = false;
-    return isClockInfoShown;
-  }
-
-  if (isClockInfoShown)
-  {
-    return true;
-  }
-  else
-  {
-
-    if (mode == 2)
-    {
-      IntervalInfo = 120000;
-      if (millis() >= now + IntervalInfo)
-      {
-        now = millis();
-        return true;
-      }
-    }
-    else if (mode == 3)
-    {
-      IntervalInfo = 180000;
-      if (millis() >= now + IntervalInfo)
-      {
-        now = millis();
-        return true;
-      }
-    }
-    else if (mode == 4)
-    {
-      IntervalInfo = 240000;
-      if (millis() >= now + IntervalInfo)
-      {
-        now = millis();
-        return true;
-      }
-    }
-    else if (mode == 5)
-    {
-      IntervalInfo = 300000;
-      if (millis() >= now + IntervalInfo)
-      {
-        now = millis();
-        return true;
-      }
-    }
     return false;
   }
+  if (isClockInfoShown) return true;
+
+  static const unsigned long intervalos[] = {0, 0, 120000, 180000, 240000, 300000};
+  if (mode >= 2 && mode <= 5) {
+    IntervalInfo = intervalos[mode];
+    if (millis() >= now + IntervalInfo) {
+      now = millis();
+      return true;
+    }
+  }
+  return false;
 }
 
 void OtherInfo()

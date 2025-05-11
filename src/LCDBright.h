@@ -4,30 +4,21 @@ void LDR_Sensor()
     filteredLDR = alpha * ldr + (1 - alpha) * filteredLDR;  // Filter equation
     //Serial.println(filteredLDR);
     bri = map(filteredLDR, 0, 1023, 0, 255);
-    //Serial.println(bri);
-    bri = (bri < 30) ? 50 : bri;
     
+    // Limitar el brillo mínimo para evitar apagado total
+    if (bri < 50) bri = 50;
+    
+    // Selección de modo de brillo
+    int pwmValue = bri;
     switch (bled)
     {
-    case 1:
-        analogWrite(BACKLIGHT_PIN, 50);
-        break;
-    case 2:
-        analogWrite(BACKLIGHT_PIN, 100);
-        break;
-    case 3:
-        analogWrite(BACKLIGHT_PIN, 150);
-        break;
-    case 4:
-        analogWrite(BACKLIGHT_PIN, 200);
-        break;
-    case 5:
-        analogWrite(BACKLIGHT_PIN, 255);
-        break;
-    case 6:
-        analogWrite(BACKLIGHT_PIN, bri);
-        break;
-    default:
-        break;
+        case 1: pwmValue = 50; break;
+        case 2: pwmValue = 100; break;
+        case 3: pwmValue = 150; break;
+        case 4: pwmValue = 200; break;
+        case 5: pwmValue = 255; break;
+        case 6: /* pwmValue ya es bri */ break;
+        default: return;
     }
+    analogWrite(BACKLIGHT_PIN, pwmValue);
 }

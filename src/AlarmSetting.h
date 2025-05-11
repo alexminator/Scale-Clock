@@ -1,33 +1,14 @@
 void showAlarmStatus()
 {
-  // fix text
-  lcd.setCursor(3, 0);
-  lcd.print("Alarm Settings");
+  lcd.setCursor(3, 0); lcd.print("Alarm Settings");
 
-  lcd.setCursor(0, 1);
-  lcd.print("Alarm 1:");
-  if (reloj.checkAlarmEnabled(1))
-  {
-    lcd.setCursor(9, 1);
-    lcd.print("Y");
-  }
-  else
-  {
-    lcd.setCursor(9, 1);
-    lcd.print("N");
-  }
-
-  lcd.setCursor(0, 2);
-  lcd.print("Alarm 2:");
-  if (reloj.checkAlarmEnabled(2))
-  {
-    lcd.setCursor(9, 2);
-    lcd.print("Y");
-  }
-  else
-  {
-    lcd.setCursor(9, 2);
-    lcd.print("N");
+  for (uint8_t i = 1; i <= 2; i++) {
+    lcd.setCursor(0, i);
+    lcd.print("Alarm ");
+    lcd.print(i);
+    lcd.print(":");
+    lcd.setCursor(9, i);
+    lcd.print(reloj.checkAlarmEnabled(i) ? "Y" : "N");
   }
 }
 
@@ -35,298 +16,110 @@ void showAlarm1()
 {
   reloj.getA1Time(alarmDay, alarmHour1, alarmMinute1, alarmSecond1, alarmBits, alarmDy, alarmH12Flag, alarmPmFlag);
   lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("  Set Alarm 1   ");
+  lcd.setCursor(0, 0); lcd.print("  Set Alarm 1   ");
 
   alarm_h1 = alarmHour1 / 10;
   alarm_h2 = alarmHour1 % 10;
-  if (alarmHour1 < 10)
-  {
-    lcd.setCursor(4, 1);
-    lcd.print("0");
-    lcd.setCursor(5, 1);
-    lcd.print(alarmHour1);
-  }
-  else
-  {
-    lcd.setCursor(4, 1);
-    lcd.print(alarmHour1);
-  }
-
-  lcd.setCursor(6, 1);
-  lcd.print(":");
-
   alarm_m1 = alarmMinute1 / 10;
   alarm_m2 = alarmMinute1 % 10;
-  if (alarmMinute1 < 10)
-  {
-    lcd.setCursor(7, 1);
-    lcd.print("0");
-    lcd.setCursor(8, 1);
-    lcd.print(alarmMinute1);
-  }
-  else
-  {
-    lcd.setCursor(7, 1);
-    lcd.print(alarmMinute1);
-  }
-
-  lcd.setCursor(9, 1);
-  lcd.print(":");
-
   alarm_s1 = alarmSecond1 / 10;
   alarm_s2 = alarmSecond1 % 10;
-  if (alarmSecond1 < 10)
-  {
-    lcd.setCursor(10, 1);
-    lcd.print("0");
-    lcd.setCursor(11, 1);
-    lcd.print(alarmSecond1);
-  }
-  else
-  {
-    lcd.setCursor(10, 1);
-    lcd.print(alarmSecond1);
-  }
+
+  lcd.setCursor(4, 1); lcd.print(alarmHour1 < 10 ? "0" : ""); lcd.print(alarmHour1);
+  lcd.setCursor(6, 1); lcd.print(":");
+  lcd.setCursor(7, 1); lcd.print(alarmMinute1 < 10 ? "0" : ""); lcd.print(alarmMinute1);
+  lcd.setCursor(9, 1); lcd.print(":");
+  lcd.setCursor(10, 1); lcd.print(alarmSecond1 < 10 ? "0" : ""); lcd.print(alarmSecond1);
 }
 
 void showAlarm2()
 {
   reloj.getA2Time(alarmDay, alarmHour2, alarmMinute2, alarmBits, alarmDy, alarmH12Flag, alarmPmFlag);
   lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("  Set Alarm 2   ");
+  lcd.setCursor(0, 0); lcd.print("  Set Alarm 2   ");
 
   alarm_hh1 = alarmHour2 / 10;
   alarm_hh2 = alarmHour2 % 10;
-  if (alarmHour2 < 10)
-  {
-    lcd.setCursor(4, 1);
-    lcd.print("0");
-    lcd.setCursor(5, 1);
-    lcd.print(alarmHour2);
-  }
-  else
-  {
-    lcd.setCursor(4, 1);
-    lcd.print(alarmHour2);
-  }
-
-  lcd.setCursor(6, 1);
-  lcd.print(":");
-
   alarm_mm1 = alarmMinute2 / 10;
   alarm_mm2 = alarmMinute2 % 10;
-  if (alarmMinute2 < 10)
-  {
-    lcd.setCursor(7, 1);
-    lcd.print("0");
-    lcd.setCursor(8, 1);
-    lcd.print(alarmMinute2);
-  }
-  else
-  {
-    lcd.setCursor(7, 1);
-    lcd.print(alarmMinute2);
-  }
+
+  lcd.setCursor(4, 1); lcd.print(alarmHour2 < 10 ? "0" : ""); lcd.print(alarmHour2);
+  lcd.setCursor(6, 1); lcd.print(":");
+  lcd.setCursor(7, 1); lcd.print(alarmMinute2 < 10 ? "0" : ""); lcd.print(alarmMinute2);
 }
 
 void changeAlarmOne()
 {
+  auto wrap = [](int &val, int max) { if (++val > max) val = 0; };
+  auto wrapDec = [](int &val, int max) { if (--val < 0) val = max; };
+
   switch (row_k)
   {
-  case 4:
-    if (!BC_flag)
-    {
-      alarm_h1 += 1;
-    }
-    else
-    {
-      alarm_h1 -= 1;
-    }
-    if (alarm_h1 > 2)
-      alarm_h1 = 0;
-    if (alarm_h1 < 0)
-      alarm_h1 = 2;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_h1);
-    alarmHour1 = alarm_h1 * 10 + alarm_h2;
-    break;
-
-  case 5:
-    if (!BC_flag)
-    {
-      alarm_h2 += 1;
-    }
-    else
-    {
-      alarm_h2 -= 1;
-    }
-    if (alarm_h2 > 9)
-      alarm_h2 = 0;
-    if (alarm_h2 < 0)
-      alarm_h2 = 9;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_h2);
-    alarmHour1 = alarm_h1 * 10 + alarm_h2;
-    break;
-
-  case 7:
-    if (!BC_flag)
-    {
-      alarm_m1 += 1;
-    }
-    else
-    {
-      alarm_m1 -= 1;
-    }
-    if (alarm_m1 > 5)
-      alarm_m1 = 0;
-    if (alarm_m1 < 0)
-      alarm_m1 = 5;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_m1);
-    alarmMinute1 = alarm_m1 * 10 + alarm_m2;
-    break;
-
-  case 8:
-    if (!BC_flag)
-    {
-      alarm_m2 += 1;
-    }
-    else
-    {
-      alarm_m2 -= 1;
-    }
-    if (alarm_m2 > 9)
-      alarm_m2 = 0;
-    if (alarm_m2 < 0)
-      alarm_m2 = 9;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_m2);
-    alarmMinute1 = alarm_m1 * 10 + alarm_m2;
-    break;
-
-  case 10:
-    if (!BC_flag)
-    {
-      alarm_s1 += 1;
-    }
-    else
-    {
-      alarm_s1 -= 1;
-    }
-    if (alarm_s1 > 5)
-      alarm_s1 = 0;
-    if (alarm_s1 < 0)
-      alarm_s1 = 5;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_s1);
-    alarmSecond1 = alarm_s1 * 10 + alarm_s2;
-    break;
-
-  case 11:
-    if (!BC_flag)
-    {
-      alarm_s2 += 1;
-    }
-    else
-    {
-      alarm_s2 -= 1;
-    }
-    if (alarm_s2 > 9)
-      alarm_s2 = 0;
-    if (alarm_s2 < 0)
-      alarm_s2 = 9;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_s2);
-    alarmSecond1 = alarm_s1 * 10 + alarm_s2;
-    break;
-
-  default:
-    break;
+    case 4:
+      (!BC_flag) ? wrap(alarm_h1, 2) : wrapDec(alarm_h1, 2);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_h1);
+      alarmHour1 = alarm_h1 * 10 + alarm_h2;
+      break;
+    case 5:
+      (!BC_flag) ? wrap(alarm_h2, 9) : wrapDec(alarm_h2, 9);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_h2);
+      alarmHour1 = alarm_h1 * 10 + alarm_h2;
+      break;
+    case 7:
+      (!BC_flag) ? wrap(alarm_m1, 5) : wrapDec(alarm_m1, 5);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_m1);
+      alarmMinute1 = alarm_m1 * 10 + alarm_m2;
+      break;
+    case 8:
+      (!BC_flag) ? wrap(alarm_m2, 9) : wrapDec(alarm_m2, 9);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_m2);
+      alarmMinute1 = alarm_m1 * 10 + alarm_m2;
+      break;
+    case 10:
+      (!BC_flag) ? wrap(alarm_s1, 5) : wrapDec(alarm_s1, 5);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_s1);
+      alarmSecond1 = alarm_s1 * 10 + alarm_s2;
+      break;
+    case 11:
+      (!BC_flag) ? wrap(alarm_s2, 9) : wrapDec(alarm_s2, 9);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_s2);
+      alarmSecond1 = alarm_s1 * 10 + alarm_s2;
+      break;
+    default:
+      break;
   }
   reloj.setA1Time(alarmDay, alarmHour1, alarmMinute1, alarmSecond1, alarmBits, alarmDy, alarmH12Flag, alarmPmFlag);
 }
 
 void changeAlarmTwo()
 {
+  auto wrap = [](int &val, int max) { if (++val > max) val = 0; };
+  auto wrapDec = [](int &val, int max) { if (--val < 0) val = max; };
+
   switch (row_k)
   {
-  case 4:
-    if (!BC_flag)
-    {
-      alarm_hh1 += 1;
-    }
-    else
-    {
-      alarm_hh1 -= 1;
-    }
-    if (alarm_hh1 > 2)
-      alarm_hh1 = 0;
-    if (alarm_hh1 < 0)
-      alarm_hh1 = 2;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_hh1);
-    alarmHour2 = alarm_hh1 * 10 + alarm_hh2;
-    break;
-
-  case 5:
-    if (!BC_flag)
-    {
-      alarm_hh2 += 1;
-    }
-    else
-    {
-      alarm_hh2 -= 1;
-    }
-    if (alarm_hh2 > 9)
-      alarm_hh2 = 0;
-    if (alarm_hh2 < 0)
-      alarm_hh2 = 9;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_hh2);
-    alarmHour2 = alarm_hh1 * 10 + alarm_hh2;
-    break;
-
-  case 7:
-    if (!BC_flag)
-    {
-      alarm_mm1 += 1;
-    }
-    else
-    {
-      alarm_mm1 -= 1;
-    }
-    if (alarm_mm1 > 5)
-      alarm_mm1 = 0;
-    if (alarm_mm1 < 0)
-      alarm_mm1 = 5;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_mm1);
-    alarmMinute2 = alarm_mm1 * 10 + alarm_mm2;
-    break;
-
-  case 8:
-    if (!BC_flag)
-    {
-      alarm_mm2 += 1;
-    }
-    else
-    {
-      alarm_mm2 -= 1;
-    }
-    if (alarm_mm2 > 9)
-      alarm_mm2 = 0;
-    if (alarm_mm2 < 0)
-      alarm_mm2 = 9;
-    lcd.setCursor(row_k, col_k);
-    lcd.print(alarm_mm2);
-    alarmMinute2 = alarm_mm1 * 10 + alarm_mm2;
-    break;
-
-  default:
-    break;
+    case 4:
+      (!BC_flag) ? wrap(alarm_hh1, 2) : wrapDec(alarm_hh1, 2);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_hh1);
+      alarmHour2 = alarm_hh1 * 10 + alarm_hh2;
+      break;
+    case 5:
+      (!BC_flag) ? wrap(alarm_hh2, 9) : wrapDec(alarm_hh2, 9);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_hh2);
+      alarmHour2 = alarm_hh1 * 10 + alarm_hh2;
+      break;
+    case 7:
+      (!BC_flag) ? wrap(alarm_mm1, 5) : wrapDec(alarm_mm1, 5);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_mm1);
+      alarmMinute2 = alarm_mm1 * 10 + alarm_mm2;
+      break;
+    case 8:
+      (!BC_flag) ? wrap(alarm_mm2, 9) : wrapDec(alarm_mm2, 9);
+      lcd.setCursor(row_k, col_k); lcd.print(alarm_mm2);
+      alarmMinute2 = alarm_mm1 * 10 + alarm_mm2;
+      break;
+    default:
+      break;
   }
   reloj.setA2Time(alarmDay, alarmHour2, alarmMinute2, alarmBits, alarmDy, alarmH12Flag, alarmPmFlag);
 }

@@ -57,7 +57,7 @@ DS3231 reloj;
 #define DOUT 13
 HX711 hx;           // Init ADC
 long ratio, offset; // define two variables, ratio is scalefactor,
-double weight = 0, P = 0, M = 0, D = 0;
+double weight = 0, P = 0, T = 0, D = 0;
 int P1, P2, P3, P4, D1, D2, D3, D4, N;
 float weight_lb;
 float weight_gr;
