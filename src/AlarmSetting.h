@@ -1,3 +1,39 @@
+void handleBlink()
+{
+  if (!ledOverride) return;
+
+  if (millis() - blinkMillis >= 30) {
+    blinkMillis = millis();
+    blinkState = !blinkState;
+    switch (blinkType) {
+      case 1: // Alarma 1: rojo
+        digitalWrite(LED1, blinkState ? HIGH : LOW);
+        digitalWrite(LED2, LOW);
+        if (blinkState) tone(BUZZER, 2000, 200); else noTone(BUZZER);
+        break;
+      case 2: // Alarma 2: verde
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, blinkState ? HIGH : LOW);
+        if (blinkState) tone(BUZZER, 1000, 200); else noTone(BUZZER);
+        break;
+      case 3: // Hora exacta: verde
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, blinkState ? HIGH : LOW);
+        if (blinkState) tone(BUZZER, 783, 100); else noTone(BUZZER);
+        // Solo la hora exacta usa el contador
+        if (!blinkState) blinkCount++;
+        if (blinkCount >= 2) {
+          ledOverride = false;
+          digitalWrite(LED1, LOW);
+          digitalWrite(LED2, LOW);
+          noTone(BUZZER);
+          blinkType = 0;
+        }
+        break;
+    }
+  }
+}
+
 void showAlarmStatus()
 {
   lcd.setCursor(3, 0); lcd.print("Alarm Settings");
@@ -126,18 +162,23 @@ void changeAlarmTwo()
 
 void alarm()
 {
-  // Indicate whether an alarm went off
-  if (reloj.checkAlarmEnabled(1) && reloj.checkIfAlarm(1))
-  { // clock 1 detects alarm
-    tone(BUZZER, 2000);
-    digitalWrite(LED1, HIGH);
-  }
+ // Alarma 1
+if (!ledOverride && reloj.checkAlarmEnabled(1) && reloj.checkIfAlarm(1)) {
+  ledOverride = true;
+  blinkType = 1;
+  blinkCount = 0;
+  blinkMillis = millis();
+  blinkState = false;
+}
 
-  if (reloj.checkAlarmEnabled(2) && reloj.checkIfAlarm(2))
-  { // clock 2 detects alarm
-    tone(BUZZER, 1000);
-    digitalWrite(LED2, HIGH);
-  }
+// Alarma 2
+if (!ledOverride && reloj.checkAlarmEnabled(2) && reloj.checkIfAlarm(2)) {
+  ledOverride = true;
+  blinkType = 2;
+  blinkCount = 0;
+  blinkMillis = millis();
+  blinkState = false;
+}
 }
 
 

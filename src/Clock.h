@@ -71,14 +71,14 @@ void BigClock()
     }
   }
 
-  // O'clock sound
-  if (minute == 0 && page == 0 && second == 0) {
-    tone(BUZZER, 783, 100);
-    delay(60);
-    digitalWrite(LED2, HIGH);
-    delay(60);
-    digitalWrite(LED2, LOW);
-  }
+// O'clock sound
+if (minute == 0 && page == 0 && second == 0 && !ledOverride) {
+  ledOverride = true;
+  blinkType = 3;  // 3 = hora exacta (verde)
+  blinkCount = 0;
+  blinkMillis = millis();
+  blinkState = false;
+}
 
   // Print LCD
   if (second != osec) {
@@ -203,7 +203,7 @@ void OtherInfo()
 void ShowDateInfo()
 {
   lcd.setCursor(0, 0);
-  lcd.print("             "); // Clean info
+  lcd.print("              "); // Clean info
 
   // Data Show
   // and the day of the week
@@ -239,9 +239,8 @@ void ShowDateInfo()
 
 void ShowBigClock()
 {
-  lcd.clear();
-  while (true)
-  {
+    static int lastSecond = -1;
+
     alarm(); // detect alarm
     LDR_Sensor();
     BigClock();
@@ -251,62 +250,68 @@ void ShowBigClock()
     // Check if the update time has passed
     if (currentMillis - startMillis >= refresh)
     {
-      startMillis = currentMillis; // Update previous time
-      acdetect();                  // Call function to detect power
-      // Only calls datablackout if powerflag is false and has not been called before
-      if (!powerflag && !blackoutTriggered)
-      {
-        blackoutAMPM = !pmFlag ? "PM" : "AM"; // Set blackoutAMPM based on pmFlag
-        datablackout();
-        blackoutTriggered = true; // Marks that datablackout has been activated
-        powerOnTriggered = false; // Reset the poweron flag
-        // Serial.println("Blackout event at: " + String(hour) + ":" + String(minute) + " " + poweronAMPM);
-      }
-      else if (powerflag && !powerOnTriggered)
-      {
-        poweronAMPM = !pmFlag ? "PM" : "AM"; // Set poweronAMPM based on pmFlag
-        datapoweron();
-        powerOnTriggered = true;   // Marks that datapoweron has been activated
-        blackoutTriggered = false; // Reset the blackout flag
-        // Serial.println("Power on event at: " + String(hour) + ":" + String(minute) + " " + poweronAMPM);
-      }
+        startMillis = currentMillis; // Update previous time
+        acdetect();                  // Call function to detect power
+        // Only calls datablackout if powerflag is false and has not been called before
+        if (!powerflag && !blackoutTriggered)
+        {
+            blackoutAMPM = !pmFlag ? "PM" : "AM"; // Set blackoutAMPM based on pmFlag
+            datablackout();
+            blackoutTriggered = true; // Marks that datablackout has been activated
+            powerOnTriggered = false; // Reset the poweron flag
+        }
+        else if (powerflag && !powerOnTriggered)
+        {
+            poweronAMPM = !pmFlag ? "PM" : "AM"; // Set poweronAMPM based on pmFlag
+            datapoweron();
+            powerOnTriggered = true;   // Marks that datapoweron has been activated
+            blackoutTriggered = false; // Reset the blackout flag
+        }
     }
 
     if (shouldShowInfo())
     {
-      ShowInfo();
+        ShowInfo();
     }
     else
     {
-      ShowDateInfo();
+        ShowDateInfo();
+    }
+
+    // Solo actualiza el reloj si cambia el segundo
+    if (second != lastSecond) {
+        printNum3(h1, 0, 1);
+        printNum3(h2, 3, 1);
+        printColon(6, 1);
+        printNum3(min1, 7, 1);
+        printNum3(min2, 10, 1);
+        printColon(13, 1);
+        printNum4(s1, 14);
+        printNum4(s2, 17);
+        lastSecond = second;
     }
 
     if (KE == 1) // Show other info sub screen. Temp & power events
     {
-      KE = 0;
-      OtherInfo();
-      break;
+        KE = 0;
+        OtherInfo();
     }
     if (KD == 1) // Power off LED 1 or LED 2 alarm and change page
     {
-      KD = 0;
-      page = 1;
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      break;
+        KD = 0;
+        page = 1;
+        digitalWrite(LED1, LOW);
+        digitalWrite(LED2, LOW);
     }
-        if (KB == 1) // Show hour in 12H mode
+    if (KB == 1) // Show hour in 12H mode
     {
-      KB = 0;
-      HourFormat12(); // Convert to 12H, only for show on bigclock
-      h12Flag = true;
-      break;
+        KB = 0;
+        HourFormat12(); // Convert to 12H, only for show on bigclock
+        h12Flag = true;
     }
     if (KC == 1) // Return to 24H mode
     {
-      KC = 0;
-      hour = reloj.getHour(h12Flag, pmFlag); // Get hour 24H format
-      break;
+        KC = 0;
+        hour = reloj.getHour(h12Flag, pmFlag); // Get hour 24H format
     }
-  }
 }

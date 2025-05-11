@@ -12,7 +12,7 @@
                  +------------| USB |------------+
                  |            +-----+            |
     DOUT HX711   | [X]D13/SCK        MISO/D12[X] |   CLK HX711
-                 | [ ]3.3V           MOSI/D11[ ]~|
+                 | [ ]3.3V           MOSI/D11[ ]~|   CHARGE DETECT
                  | [ ]V.ref     ___    SS/D10[X]~|   BACKLIGHT
     BUZZER       | [X]A0       / N \       D9[X]~|   KEYPAD
     LED 1        | [X]A1      /  A  \      D8[X] |   KEYPAD
@@ -69,6 +69,13 @@ bool scale_flag = false;                    // false is pricing scale,true is co
 // The two LEDs are connected to A1 and A2. Turning analog pin into digital pin
 #define LED1 A1
 #define LED2 A2
+
+// Variables de control para parpadeo no bloqueante
+volatile bool ledOverride = false;
+unsigned long blinkMillis = 0;
+int blinkCount = 0;
+bool blinkState = false;
+int blinkType = 0; // 1=alarma1, 2=alarma2, 3=oclock
 
 // Brightness LCD control using LDR
 #define LDR_PIN A3
@@ -133,6 +140,7 @@ float powervcc;
 
 // Power detect
 #define POWERPIN A7
+#define CHRGPIN 11 // Pin to detect charge
 float powersensor;
 int sensorVCC, filteredVCC;
 byte blackoutTimeH, blackoutTimeDate, blackoutTimeM, poweronTimeH, poweronTimeM, poweronTimeDate;
@@ -188,6 +196,7 @@ void setup()
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
   pinMode(LDR_PIN, INPUT);
+  pinMode(CHRGPIN, INPUT);
   pinMode(BACKLIGHT_PIN, OUTPUT);
 
   lcd.init();      // initialize LCD
@@ -255,19 +264,33 @@ void loop()
      when page is 3, show clock settings
   */
 
+  handleBlink();
+
+  if (ledOverride && (blinkType == 1 || blinkType == 2) && KF == 1) {  //Alarm off with key #
+    ledOverride = false;
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, LOW);
+    noTone(BUZZER);
+    blinkType = 0;
+    KF = 0; // Limpia la bandera de tecla
+}
+
+  if (!ledOverride) {
+    bool charging = digitalRead(CHRGPIN) == LOW;
+    if (charging) {
+      digitalWrite(LED1, HIGH); // Rojo: cargando
+      digitalWrite(LED2, LOW);  // Verde: apagado
+    } else {
+      digitalWrite(LED1, LOW);  // Rojo: apagado
+      digitalWrite(LED2, LOW); // Verde: apagado
+    }
+  }
+
   switch (page)
   {
-  case 0:
-    ShowBigClock();
-    break;
-  case 1:
-    showAlarmPage();
-    break;
-  case 2:
-    showScalePage();
-    break;
-  case 3:
-    showDatePage();
-    break;
+    case 0: ShowBigClock(); break;
+    case 1: showAlarmPage(); break;
+    case 2: showScalePage(); break;
+    case 3: showDatePage(); break;
   }
 }
