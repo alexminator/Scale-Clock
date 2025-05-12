@@ -14,7 +14,9 @@ void HourFormat12()
 }
 
 void ShowInfo()
-{
+{ 
+  lcd.noCursor(); // <-- Desactiva el cursor
+  lcd.noBlink();  // <-- Desactiva el parpadeo del cursor
   if (!isClockInfoShown) {
     startCollecting = millis();
     isClockInfoShown = true;
@@ -240,7 +242,6 @@ void ShowDateInfo()
 void ShowBigClock()
 {
     static int lastSecond = -1;
-
     alarm(); // detect alarm
     LDR_Sensor();
     BigClock();

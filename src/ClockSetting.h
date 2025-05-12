@@ -263,8 +263,7 @@ void showDatePage(void)
     {
       KD = 0;
       page = 0;
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
+      lcd.clear();
       break;
     }
   }
