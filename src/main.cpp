@@ -46,8 +46,8 @@
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 // intro progressBAR glyph
-byte progress1[] = {B00000, B00000, B00000, B00000, B11000, B11000, B11000, B11000};
-byte progress2[] = {B00000, B00000, B00000, B00000, B11011, B11011, B11011, B11011};
+const byte progress1[8] PROGMEM = {B00000, B00000, B00000, B00000, B11000, B11000, B11000, B11000};
+const byte progress2[8] PROGMEM = {B00000, B00000, B00000, B00000, B11011, B11011, B11011, B11011};
 
 // DS module
 DS3231 reloj;
@@ -123,9 +123,17 @@ int alarm_h1, alarm_h2, alarm_m1, alarm_m2, alarm_s1, alarm_s2;
 int alarm_hh1, alarm_hh2, alarm_mm1, alarm_mm2;
 bool BC_flag; // false selective value plus 1, true sselective value subtracts 1
 
-String M_arr[12] = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
-String WD_arr[7] = {"Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"};
-String day, monthName;
+// Declaración en PROGMEM
+const char M_arr[12][4] PROGMEM = {
+  "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+  "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
+};
+const char WD_arr[7][5] PROGMEM = {
+  "Lun,", "Mar,", "Mie,", "Jue,", "Vie,", "Sab,", "Dom,"
+};
+// Buffers temporales para copiar el texto
+char day[5];
+char monthName[4];
 
 // Time info variables
 int mode; // Time to show other info. Min 2 mint.
@@ -144,7 +152,10 @@ float powervcc;
 float powersensor;
 int sensorVCC, filteredVCC;
 byte blackoutTimeH, blackoutTimeDate, blackoutTimeM, poweronTimeH, poweronTimeM, poweronTimeDate;
-String blackoutTimeMonth, poweronTimeMonth, blackoutAMPM, poweronAMPM, formattedHourBlackout, formattedMinuteBlackout, formattedHourPoweron, formattedMinutePoweron;
+char blackoutTimeMonth[4], poweronTimeMonth[4];
+char blackoutAMPM[3], poweronAMPM[3];
+char formattedHourBlackout[3], formattedMinuteBlackout[3];
+char formattedHourPoweron[3], formattedMinutePoweron[3];
 bool powerflag; // True, there's 5v power from supply. False a blackout event happens
 bool blackoutTriggered = false; // Flag to control the activation of datablackout
 bool powerOnTriggered = false;   // Flag to control the activation of poweron
@@ -214,9 +225,11 @@ void setup()
   // intro
   tone(BUZZER, 1971, 100);
   delay(60);
-
-  lcd.createChar(1, progress1);
-  lcd.createChar(2, progress2);
+  byte tempChar[8];
+  memcpy_P(tempChar, progress1, 8);
+  lcd.createChar(1, tempChar);
+  memcpy_P(tempChar, progress2, 8);
+  lcd.createChar(2, tempChar);
   lcd.home();
   lcd.setCursor(2, 0);
   lcd.print("RELOJ - BALANZA");

@@ -61,7 +61,7 @@ void BigClock()
 
   // info for save blackout event
   month = reloj.getMonth(century);
-  monthName = M_arr[month - 1];
+  strcpy_P(monthName, (PGM_P)M_arr[month - 1]);
 
   // Mostrar info cada cierto tiempo según modo
   static const unsigned long intervalos[] = {0, 0, 120000, 180000, 240000, 300000};
@@ -144,12 +144,12 @@ void OtherInfo()
     EEPROM.get(70, blackoutTimeMonth);
     lcd.setCursor(0, 0);
     lcd.print("OFF:");
-    formattedHourBlackout = (blackoutTimeH < 10) ? "0" + String(blackoutTimeH) : String(blackoutTimeH);
+    snprintf(formattedHourBlackout, sizeof(formattedHourBlackout), "%02d", blackoutTimeH);
     lcd.setCursor(5, 0);
     lcd.print(formattedHourBlackout);
     lcd.setCursor(7, 0);
     lcd.print(":");
-    formattedMinuteBlackout = (blackoutTimeM < 10) ? "0" + String(blackoutTimeM) : String(blackoutTimeM);
+    snprintf(formattedMinuteBlackout, sizeof(formattedMinuteBlackout), "%02d", blackoutTimeM);
     lcd.setCursor(8, 0);
     lcd.print(formattedMinuteBlackout);
     lcd.setCursor(11, 0);
@@ -168,12 +168,12 @@ void OtherInfo()
     EEPROM.get(120, poweronTimeMonth);
     lcd.setCursor(0, 1);
     lcd.print("ON :");
-    formattedHourPoweron = (poweronTimeH < 10) ? "0" + String(poweronTimeH) : String(poweronTimeH);
+    snprintf(formattedHourPoweron, sizeof(formattedHourPoweron), "%02d", poweronTimeH);
     lcd.setCursor(5, 1);
     lcd.print(formattedHourPoweron);
     lcd.setCursor(7, 1);
     lcd.print(":");
-    formattedMinutePoweron = (poweronTimeM < 10) ? "0" + String(poweronTimeM) : String(poweronTimeM);
+    snprintf(formattedMinutePoweron, sizeof(formattedMinutePoweron), "%02d", poweronTimeM);
     lcd.setCursor(8, 1);
     lcd.print(formattedMinutePoweron);
     lcd.setCursor(11, 1);
@@ -206,11 +206,11 @@ void ShowDateInfo()
 {
   lcd.setCursor(0, 0);
   lcd.print("              "); // Clean info
-
+ 
   // Data Show
   // and the day of the week
   week = reloj.getDoW();
-  day = WD_arr[week - 1];
+  strcpy_P(day, (PGM_P)WD_arr[week - 1]);
   lcd.setCursor(0, 0);
   lcd.print(day);
 
@@ -221,7 +221,7 @@ void ShowDateInfo()
 
   // then the month
   month = reloj.getMonth(century);
-  monthName = M_arr[month - 1];
+  strcpy_P(monthName, (PGM_P)M_arr[month - 1]);
   lcd.setCursor(7, 0);
   lcd.print(monthName); // Minus one, arrays begins in 0
 
@@ -256,14 +256,14 @@ void ShowBigClock()
         // Only calls datablackout if powerflag is false and has not been called before
         if (!powerflag && !blackoutTriggered)
         {
-            blackoutAMPM = !pmFlag ? "PM" : "AM"; // Set blackoutAMPM based on pmFlag
+            strcpy(blackoutAMPM, !pmFlag ? "PM" : "AM"); // Set blackoutAMPM based on pmFlag
             datablackout();
             blackoutTriggered = true; // Marks that datablackout has been activated
             powerOnTriggered = false; // Reset the poweron flag
         }
         else if (powerflag && !powerOnTriggered)
         {
-            poweronAMPM = !pmFlag ? "PM" : "AM"; // Set poweronAMPM based on pmFlag
+            strcpy(poweronAMPM, !pmFlag ? "PM" : "AM"); // Set poweronAMPM based on pmFlag
             datapoweron();
             powerOnTriggered = true;   // Marks that datapoweron has been activated
             blackoutTriggered = false; // Reset the blackout flag
