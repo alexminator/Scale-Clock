@@ -109,7 +109,7 @@ void calibrate() {
     lcd.setCursor(1, 0);
     lcd.print("Peso Conocido:");
     lcd.setCursor(1, 1);
-    lcd.print(known_weight[i]);
+    lcd.print(pgm_read_word(&known_weight[i]));
     lcd.print(" g");
 
     // Search weight
@@ -135,7 +135,7 @@ void calibrate() {
       adc_lecture = hx.get_value(100);
 
       // Calculate ratio
-      ratio = adc_lecture / known_weight[i];
+      ratio = adc_lecture / pgm_read_word(&known_weight[i]);
 
       // Save on EEPROM
       EEPROM.put(0, ratio);

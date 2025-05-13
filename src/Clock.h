@@ -118,88 +118,89 @@ bool shouldShowInfo()
 
 void OtherInfo()
 {
-  lcd.clear();
-  while (true)
+  static bool firstEntry = true;
+  if (firstEntry)
   {
-    alarm(); // detect alarm
-    LDR_Sensor();
-    enter();
-    VccVoltageReader();
+    lcd.clear();
+    firstEntry = false;
+  }
+  alarm(); // detect alarm
+  LDR_Sensor();
+  enter();
+  VccVoltageReader();
 
-    // Battery
-    lcd.setCursor(0, 2);
-    lcd.print("VCC:");
-    lcd.setCursor(5, 2);
-    lcd.print(powervcc);
-    lcd.setCursor(9, 2);
-    lcd.print("V");
-    lcd.setCursor(11, 2);
-    lcd.print(!powerflag ? "Using BAT" : "Charging");
+  // Battery
+  lcd.setCursor(0, 2);
+  lcd.print("VCC:");
+  lcd.setCursor(5, 2);
+  lcd.print(powervcc);
+  lcd.setCursor(9, 2);
+  lcd.print("V");
+  lcd.setCursor(11, 2);
+  lcd.print(!powerflag ? "Using BAT" : "Charging");
 
-    // Blackout data
-    EEPROM.get(30, blackoutTimeH);
-    EEPROM.get(40, blackoutTimeM);
-    EEPROM.get(50, blackoutTimeDate);
-    EEPROM.get(60, blackoutAMPM);
-    EEPROM.get(70, blackoutTimeMonth);
-    lcd.setCursor(0, 0);
-    lcd.print("OFF:");
-    snprintf(formattedHourBlackout, sizeof(formattedHourBlackout), "%02d", blackoutTimeH);
-    lcd.setCursor(5, 0);
-    lcd.print(formattedHourBlackout);
-    lcd.setCursor(7, 0);
-    lcd.print(":");
-    snprintf(formattedMinuteBlackout, sizeof(formattedMinuteBlackout), "%02d", blackoutTimeM);
-    lcd.setCursor(8, 0);
-    lcd.print(formattedMinuteBlackout);
-    lcd.setCursor(11, 0);
-    lcd.print(blackoutAMPM);
-    lcd.setCursor(14, 0);
-    lcd.print(blackoutTimeDate);
-    lcd.setCursor(16, 0);
-    lcd.print(",");
-    lcd.setCursor(17, 0);
-    lcd.print(blackoutTimeMonth);
-    // Power on data
-    EEPROM.get(80, poweronTimeH);
-    EEPROM.get(90, poweronTimeM);
-    EEPROM.get(100, poweronTimeDate);
-    EEPROM.get(110, poweronAMPM);
-    EEPROM.get(120, poweronTimeMonth);
-    lcd.setCursor(0, 1);
-    lcd.print("ON :");
-    snprintf(formattedHourPoweron, sizeof(formattedHourPoweron), "%02d", poweronTimeH);
-    lcd.setCursor(5, 1);
-    lcd.print(formattedHourPoweron);
-    lcd.setCursor(7, 1);
-    lcd.print(":");
-    snprintf(formattedMinutePoweron, sizeof(formattedMinutePoweron), "%02d", poweronTimeM);
-    lcd.setCursor(8, 1);
-    lcd.print(formattedMinutePoweron);
-    lcd.setCursor(11, 1);
-    lcd.print(poweronAMPM);
-    lcd.setCursor(14, 1);
-    lcd.print(poweronTimeDate);
-    lcd.setCursor(16, 1);
-    lcd.print(",");
-    lcd.setCursor(17, 1);
-    lcd.print(poweronTimeMonth);
+  // Blackout data
+  EEPROM.get(30, blackoutTimeH);
+  EEPROM.get(40, blackoutTimeM);
+  EEPROM.get(50, blackoutTimeDate);
+  EEPROM.get(60, blackoutAMPM);
+  EEPROM.get(70, blackoutTimeMonth);
+  lcd.setCursor(0, 0);
+  lcd.print("OFF:");
+  snprintf(formattedHourBlackout, sizeof(formattedHourBlackout), "%02d", blackoutTimeH);
+  lcd.setCursor(5, 0);
+  lcd.print(formattedHourBlackout);
+  lcd.setCursor(7, 0);
+  lcd.print(":");
+  snprintf(formattedMinuteBlackout, sizeof(formattedMinuteBlackout), "%02d", blackoutTimeM);
+  lcd.setCursor(8, 0);
+  lcd.print(formattedMinuteBlackout);
+  lcd.setCursor(11, 0);
+  lcd.print(blackoutAMPM);
+  lcd.setCursor(14, 0);
+  lcd.print(blackoutTimeDate);
+  lcd.setCursor(16, 0);
+  lcd.print(",");
+  lcd.setCursor(17, 0);
+  lcd.print(blackoutTimeMonth);
+  // Power on data
+  EEPROM.get(80, poweronTimeH);
+  EEPROM.get(90, poweronTimeM);
+  EEPROM.get(100, poweronTimeDate);
+  EEPROM.get(110, poweronAMPM);
+  EEPROM.get(120, poweronTimeMonth);
+  lcd.setCursor(0, 1);
+  lcd.print("ON :");
+  snprintf(formattedHourPoweron, sizeof(formattedHourPoweron), "%02d", poweronTimeH);
+  lcd.setCursor(5, 1);
+  lcd.print(formattedHourPoweron);
+  lcd.setCursor(7, 1);
+  lcd.print(":");
+  snprintf(formattedMinutePoweron, sizeof(formattedMinutePoweron), "%02d", poweronTimeM);
+  lcd.setCursor(8, 1);
+  lcd.print(formattedMinutePoweron);
+  lcd.setCursor(11, 1);
+  lcd.print(poweronAMPM);
+  lcd.setCursor(14, 1);
+  lcd.print(poweronTimeDate);
+  lcd.setCursor(16, 1);
+  lcd.print(",");
+  lcd.setCursor(17, 1);
+  lcd.print(poweronTimeMonth);
 
-    if (KE == 1) // Back to BigClock
-    {
-      KE = 0;
-      page = 0;
-      break;
-    }
+  if (KE == 1) // Back to BigClock
+  {
+    KE = 0;
+    page = 0;
+    firstEntry = true;
+  }
     if (KD == 1) // Power off LED 1 or LED 2 alarm and change page
     {
       KD = 0;
       page = 1;
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      break;
+      firstEntry = true;
     }
-  }
+  
 }
 
 void ShowDateInfo()
@@ -295,14 +296,12 @@ void ShowBigClock()
     if (KE == 1) // Show other info sub screen. Temp & power events
     {
         KE = 0;
-        OtherInfo();
+        page = 4; // Cambia a la página de OtherInfo
     }
     if (KD == 1) // Power off LED 1 or LED 2 alarm and change page
     {
         KD = 0;
         page = 1;
-        digitalWrite(LED1, LOW);
-        digitalWrite(LED2, LOW);
     }
     if (KB == 1) // Show hour in 12H mode
     {

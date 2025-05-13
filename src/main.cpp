@@ -63,7 +63,7 @@ float weight_lb;
 float weight_gr;
 float weight_oz;
 float weight_kg;
-int known_weight[4] = {50, 100, 500, 1000}; // Change with knowning weight
+const int known_weight[4] PROGMEM = {50, 100, 500, 1000}; // Change with knowning weight
 bool scale_flag = false;                    // false is pricing scale,true is counting scale
 
 // The two LEDs are connected to A1 and A2. Turning analog pin into digital pin
@@ -305,5 +305,6 @@ void loop()
     case 1: showAlarmPage(); break;
     case 2: showScalePage(); break;
     case 3: showDatePage(); break;
+    case 4: OtherInfo(); break;
   }
 }
